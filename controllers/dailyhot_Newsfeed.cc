@@ -293,9 +293,10 @@ LOG_INFO << "URL: " << req_path;
                 respData["from"] = "server";
                 respData["total"] = respData["data"].size();
                 respData["updateTime"] = trantor::Date::now().toDbStringLocal();
-                val_str = m_allNewsSrc.at(src).second;
                 if (m_typeRankName.find(type) != m_typeRankName.end())
                     val_str = m_typeRankName.at(type);
+                else
+                    val_str = m_allNewsSrc.at(src).second;
                 
                 respData["subtitle"] = val_str;
                 respData["source"] = src;
