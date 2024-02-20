@@ -39,6 +39,11 @@ Newsfeed::Newsfeed()
                 })
 , m_wyCategories({"19723756", "3779629", "2884035", "3778678"})
 , m_qqCategories({"62", "26", "27", "4", "52", "67"})
+, m_typeRankName({{"19723756", "飙升榜"}, {"3779629", "新歌榜"}, 
+                  {"2884035", "原创榜"}, {"3778678", "热歌榜"},
+                  {"62", "飙升榜"}, {"26", "热歌榜"}, 
+                  {"27", "新歌榜"}, {"4", "流行指数榜"}, 
+                  {"52", "腾讯音乐人原创榜"}, {"67", "听歌识曲榜"}})
 {
 }
 
@@ -267,6 +272,7 @@ Task<Json::Value> Newsfeed::FetchNewData(const std::string &src, const std::stri
     news_src->m_parameter = type;
     std::string req_path = news_src->srcURL();
     std::string key = src;
+    std::string val_str;
 LOG_INFO << "URL: " << req_path;
     auto client = CreateHttpClient(req_path);
     
@@ -287,7 +293,11 @@ LOG_INFO << "URL: " << req_path;
                 respData["from"] = "server";
                 respData["total"] = respData["data"].size();
                 respData["updateTime"] = trantor::Date::now().toDbStringLocal();
-                respData["subtitle"] = m_allNewsSrc.at(src).second;
+                val_str = m_allNewsSrc.at(src).second;
+                if (m_typeRankName.find(type) != m_typeRankName.end())
+                    val_str = m_typeRankName.at(type);
+                
+                respData["subtitle"] = val_str;
                 respData["source"] = src;
                 key = type.empty() ? src : std::format("{}:{}", src, type);
                 news_src->Save(key, respData);

@@ -54,6 +54,7 @@ class Newsfeed : public HttpController<Newsfeed>
     const std::vector<std::string> m_ckxxChannels; // 参考消息频道
     const std::vector<std::string> m_wyCategories; // 网易云音乐榜单
     const std::vector<std::string> m_qqCategories; // QQ音乐榜单
+    const std::map<std::string, std::string> m_typeRankName; // 音乐榜单名
 };
 }
 
