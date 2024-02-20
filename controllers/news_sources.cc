@@ -1,3 +1,4 @@
+#include <fstream>
 #include <regex>
 #include "news_sources.h"
 #include <pugixml.hpp>
@@ -482,6 +483,7 @@ Json::Value src_douban_group::ParseData(const HttpResponsePtr& pResp) const
             Json::Value eachTopic;
             eachTopic["title"] = parser.getNodeText(title_a);
             eachTopic["url"] = title_a["href"];
+            eachTopic["mobileUrl"] = title_a["href"];
 
             const TagNode& likes = parser.find(item, "div", {{"class", "likes"}}, found);
             if (found)
@@ -987,19 +989,90 @@ Json::Value src_netease::ParseData(const HttpResponsePtr& pResp) const
     return finalResp;
 }
 
-HttpRequestPtr src_netease_music_toplist::CreateRequest(const drogon::HttpClientPtr& client) const
+HttpRequestPtr src_netease_music::CreateRequest(const drogon::HttpClientPtr& client) const
 {
+    client->setUserAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36 Edg/114.0.1823.67");
     return HttpRequest::newHttpRequest();
 }
 
-std::string src_netease_music_toplist::srcURL() const
+std::string src_netease_music::srcURL() const
 {
-    return "https://music.163.com/discover/toplist?id=";
+    std::string url{"https://music.163.com/discover/toplist?id="};
+    return url + m_parameter;
 }
 
-Json::Value src_netease_music_toplist::ParseData(const HttpResponsePtr& pResp) const
+Json::Value src_netease_music::ParseData(const HttpResponsePtr& pResp) const
 {
-    return Json::Value();
+    Json::Value finalResp;
+    // 返回格式为text/html
+    if ((pResp->contentType() != CT_TEXT_HTML) || pResp->body().empty())
+    {
+        finalResp["code"] = static_cast<int>(k500InternalServerError);
+        finalResp["message"] = "网易云音乐返回内容格式错误！";
+        return finalResp;
+    }
+
+    const std::string prefix{"<textarea id=\"song-list-pre-data\" style=\"display:none;\">"};
+    std::string htmlBody{pResp->body()};
+    Json::Value root;
+    auto bgn = htmlBody.find(prefix);
+    if (bgn != std::string::npos)
+    {
+        bgn += prefix.length();
+        auto end = htmlBody.find("</textarea>", bgn);
+        if (end != std::string::npos && end > bgn)
+        {
+            Json::CharReaderBuilder readFromstr;
+            std::stringstream ss(htmlBody.substr(bgn, end - bgn));
+            std::string parseError;
+            if (!Json::parseFromStream(readFromstr, ss, &root, &parseError))
+            {
+                finalResp["code"] = static_cast<int>(k500InternalServerError);
+                finalResp["message"] = "返回HTML中json块的格式错误！";
+                return finalResp;
+            }
+        }
+    }
+
+    if (false == root.isArray())
+    {
+        finalResp["code"] = static_cast<int>(k500InternalServerError);
+        finalResp["message"] = "解析json的内容错误，不是array！";
+        return finalResp;
+    }
+
+    std::string val_str;
+    for (auto each : root)
+    {
+        Json::Value song;
+        const std::string id_str{each["id"].asString()};
+        song["id"] = id_str;
+        std::string singers;
+        if (each["artists"].isArray())
+        {
+            for (auto itr = each["artists"].begin(); itr != each["artists"].end(); ++itr)
+            {
+                if (itr != each["artists"].begin())
+                    singers += " & ";
+                
+                singers += (*itr)["name"].asString();
+            }
+        }
+
+        val_str = each["name"].asString();
+        
+        if (singers.empty() == false)
+            val_str += " - " + singers;
+
+        song["title"] = val_str;
+        song["pic"] = each["album"]["picUrl"];
+            
+        song["url"] = "https://music.163.com/song?id=" + id_str;
+        song["mobileUrl"] = song["url"];
+        finalResp["data"].append(song);
+    }
+
+    return finalResp;
 }
 
 HttpRequestPtr src_newsqq::CreateRequest(const drogon::HttpClientPtr& client) const
@@ -1050,74 +1123,110 @@ Json::Value src_newsqq::ParseData(const HttpResponsePtr& pResp) const
     return finalResp;
 }
 
-HttpRequestPtr src_ngabbs::CreateRequest(const drogon::HttpClientPtr& client) const
+HttpRequestPtr src_qq_music::CreateRequest(const drogon::HttpClientPtr& client) const
 {
-    client->setUserAgent("NGA/7.3.1 (iPhone; iOS 17.2.1; Scale/3.00)");
-    auto pReq = HttpRequest::newHttpFormPostRequest();
-    pReq->setParameter("__output", "14");
-    pReq->addHeader("Host", "ngabbs.com");
-    pReq->addHeader("Accept", "*/*");
-    pReq->addHeader("Accept-Encoding", "gzip, deflate, br");
-    pReq->addHeader("Connection", "keep-alive");
-    pReq->addHeader("Content-Length", "11");
-    pReq->addHeader("Accept-Language", "zh-Hans-CN;q=1");
-    pReq->addHeader("Referer", "https://ngabbs.com/");
-    pReq->addHeader("X-User-Agent", "NGA_skull/7.3.1(iPhone13,2;iOS 17.2.1)");
-    pReq->setMethod(drogon::Post);
-    return pReq;
-}
-
-std::string src_ngabbs::srcURL() const
-{
-    return "https://ngabbs.com/nuke.php?__lib=load_topic&__act=load_topic_reply_ladder2&opt=1&all=1";
-}
-
-Json::Value src_ngabbs::ParseData(const HttpResponsePtr& pResp) const
-{
-    Json::Value finalResp;
-
-    // 返回格式为text/json
-    if ((pResp->contentType() != CT_CUSTOM) || 
-        !(pResp->jsonObject()))
-    {
-        finalResp["code"] = static_cast<int>(k500InternalServerError);
-        finalResp["message"] = "NGA论坛 返回内容格式错误！";
-        return finalResp;
-    }
-
-    std::string val_str{"https://new.qq.com/rain/a/"};
-    const Json::Value& root = *(pResp->jsonObject());
-    if (root["result"].isArray())
-    {
-        for (auto each : root["result"])
-        {
-            Json::Value item;
-            item["author"] = each["author"];
-            item["title"] = each["subject"];
-            item["hot"] = each["replies"];
-            val_str = "https://bbs.nga.cn/read.php?tid=" + each["tid"].asString();
-            item["url"] = val_str;
-            item["mobileUrl"] = val_str;
-            finalResp["data"].append(item);
-        }
-    }
-
-    return finalResp;
-}
-
-HttpRequestPtr src_qq_music_toplist::CreateRequest(const drogon::HttpClientPtr& client) const
-{
+    client->setUserAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36 Edg/114.0.1823.67");
     return HttpRequest::newHttpRequest();
 }
 
-std::string src_qq_music_toplist::srcURL() const
+std::string src_qq_music::srcURL() const
 {
-    return "https://y.qq.com/n/ryqq/toplist";
+    return "https://y.qq.com/n/ryqq/toplist/" + m_parameter;
 }
 
-Json::Value src_qq_music_toplist::ParseData(const HttpResponsePtr& pResp) const
+Json::Value src_qq_music::ParseData(const HttpResponsePtr& pResp) const
 {
-    return Json::Value();
+    Json::Value finalResp;
+    // 返回格式为text/html
+    if ((pResp->contentType() != CT_TEXT_HTML) || pResp->body().empty())
+    {
+        finalResp["code"] = static_cast<int>(k500InternalServerError);
+        finalResp["message"] = "QQ音乐返回内容格式错误！";
+        return finalResp;
+    }
+
+    const std::string prefix{"window.__INITIAL_DATA__ ="};
+    std::string htmlBody{pResp->body()};
+    Json::Value root;
+    auto bgn = htmlBody.find(prefix);
+    if (bgn != std::string::npos)
+    {
+        bgn += prefix.length();
+        auto end = htmlBody.find("</script>", bgn);
+        if (end != std::string::npos && end > bgn)
+        {
+            Json::CharReaderBuilder readFromstr;
+            std::string resp_str{htmlBody.substr(bgn, end - bgn)};
+
+            std::string invalidOne = "\"title_hilight\":undefined,";
+            std::string newStr = "\"title_hilight\":\"undefined\",";
+            std::string::size_type pos = 0;
+            // 替换所有指定子串
+            while((pos = resp_str.find(invalidOne)) != std::string::npos)
+                resp_str.replace(pos, invalidOne.length(), newStr);
+
+            std::ofstream fout;
+            fout.open("qqmusic.json", std::ios::app);
+            fout << resp_str;
+
+            std::stringstream ss(resp_str);
+            std::string parseError;
+            if (!Json::parseFromStream(readFromstr, ss, &root, &parseError))
+            {
+                finalResp["code"] = static_cast<int>(k500InternalServerError);
+                finalResp["message"] = "返回HTML中json块的格式错误！";
+                return finalResp;
+            }
+        }
+    }
+
+    if (false == root["songInfoList"].isArray())
+    {
+        finalResp["code"] = static_cast<int>(k500InternalServerError);
+        finalResp["message"] = "解析json的内容错误，不是array！";
+        return finalResp;
+    }
+
+    std::string val_str;
+    for (auto each : root["songInfoList"])
+    {
+        Json::Value song;
+        const std::string id_str{each["mid"].asString()};
+        song["id"] = id_str;
+        
+        std::string singers;
+        if (each["singer"].isArray())
+        {
+            for (auto itr = each["singer"].begin(); itr != each["singer"].end(); ++itr)
+            {
+                if (itr != each["singer"].begin())
+                    singers += " & ";
+                
+                singers += (*itr)["name"].asString();
+            }
+        }
+
+        val_str = each["title"].asString();
+        if (each["subtitle"].asString().empty() == false)
+            val_str += " " + each["subtitle"].asString();
+        
+        if (singers.empty() == false)
+            val_str += " - " + singers;
+
+        song["title"] = val_str;
+        val_str = each["coverUrl"].asString();
+        val_str = "https:" + dailyhot::UnEscape(val_str);
+        size_t tail = val_str.find("?max_age");
+        if (tail != std::string::npos)
+            val_str = val_str.substr(0, tail);
+
+        song["pic"] = val_str;
+        song["url"] = "https://y.qq.com/n/ryqq/songDetail/" + id_str;
+        song["mobileUrl"] = song["url"];
+        finalResp["data"].append(song);
+    }
+
+    return finalResp;
 }
 
 HttpRequestPtr src_smth::CreateRequest(const drogon::HttpClientPtr& client) const
@@ -1368,17 +1477,70 @@ Json::Value src_toutiao::ParseData(const HttpResponsePtr& pResp) const
 
 HttpRequestPtr src_v2ex::CreateRequest(const drogon::HttpClientPtr& client) const
 {
+    client->setUserAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36 Edg/114.0.1823.67");
     return HttpRequest::newHttpRequest();
 }
 
 std::string src_v2ex::srcURL() const
 {
-    return "https://gh.shankun.xyz/https://www.v2ex.com/?tab=hot";
+    return "https://gh.shankun.xyz/https://machbbs.com/v2ex/?tab=hot";
 }
 
 Json::Value src_v2ex::ParseData(const HttpResponsePtr& pResp) const
 {
-    return Json::Value();
+    Json::Value finalResp;
+    // 返回格式为text/html
+    if ((pResp->contentType() != CT_TEXT_HTML) || pResp->body().empty())
+    {
+        finalResp["code"] = static_cast<int>(k500InternalServerError);
+        finalResp["message"] = "v2ex 返回内容格式错误！";
+        return finalResp;
+    }
+
+    std::string strVal;
+    std::string resp_str{pResp->body()};
+    std::replace(resp_str.begin(), resp_str.end(), '\n',' ');
+
+    try
+    {
+        BeautifulSoup parser(resp_str);
+        auto subjects = parser.find_all("div", {{"class", "media-body"}});
+
+        for(const TagNode& subject : subjects)
+        {
+            Json::Value eachSubject;
+            bool found = false;
+            const TagNode& link = parser.find(subject, "a", found);
+            if (!found)
+                continue;
+
+            eachSubject["title"] = parser.getNodeText(link);
+            eachSubject["url"] = link["href"];
+
+            eachSubject["mobileUrl"] = link["href"];
+            const TagNode& userName = parser.find(subject, "span", found);
+            if (found)
+            {
+                eachSubject["member"] = parser.getNodeText(userName);
+                eachSubject["time"] = parser.getNodeText(userName.getNextSibling());
+            }
+
+            const TagNode& commentNum = parser.find(link.getNextSibling(), "span", 
+                                        {{"class", "ml-2"}}, found);
+            if (found)
+                eachSubject["comments"] = parser.getNodeText(commentNum);
+            
+            finalResp["data"].append(eachSubject);
+        }
+    }
+    catch(const std::exception& e)
+    {
+        finalResp["code"] = static_cast<int>(k500InternalServerError);
+        finalResp["message"] = e.what();
+        return finalResp;
+    }
+    
+    return finalResp;
 }
 
 HttpRequestPtr src_weibo::CreateRequest(const drogon::HttpClientPtr& client) const
@@ -1525,7 +1687,7 @@ Json::Value src_zhihu::ParseData(const HttpResponsePtr& pResp) const
     }
 
     std::string val_str;
-    const std::regex notNumber{R"([^\d])"};
+    const std::regex notNumber{R"([^\d.])"};
     const Json::Value& contents = root["initialState"]["topstory"]["hotList"];
     if (contents.isArray())
     {
@@ -1533,7 +1695,6 @@ Json::Value src_zhihu::ParseData(const HttpResponsePtr& pResp) const
         {
             Json::Value item;
             const std::string id_str{each["id"].asString()};
-            const auto &candidate = root["defaultClient"][id_str];
             item["title"] = each["target"]["titleArea"]["text"];
             item["desc"] = each["target"]["excerptArea"]["text"];
             val_str = each["target"]["imageArea"]["url"].asString();
@@ -1544,7 +1705,10 @@ Json::Value src_zhihu::ParseData(const HttpResponsePtr& pResp) const
             std::string text =
                 std::regex_replace(val_str, notNumber, std::string(" "));
 
-            item["hot"] = std::stoi(text) * 10000;
+            text.erase(std::remove(text.begin(), text.end(), ' '), text.end());
+            if (false == text.empty())
+                item["hot"] = std::stof(text) * 10000;
+                
             item["url"] = each["target"]["link"]["url"];
             item["mobileUrl"] = item["url"];
             finalResp["data"].append(item);

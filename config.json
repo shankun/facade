@@ -294,15 +294,6 @@
                 "is_recursive": true,
                 "filters": []
 	    }
-	    // {
-		    //     "uri_prefix": "/hydocs/",
-            //     "default_content_type": "text/html",
-            //     "alias": "hydocs/",
-            //     "is_case_sensitive": false,
-            //     "allow_all": true,
-            //     "is_recursive": true,
-            //     "filters": []
-	        // }
         ],
         //max_connections: maximum number of connections, 100000 by default
         "max_connections": 100000,

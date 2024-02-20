@@ -19,13 +19,15 @@ Newsfeed::Newsfeed()
                 {"juejin", {"稀土掘金", "热榜"}},
                 {"kuaishou", {"快手", "热榜"}},
                 {"netease", {"网易新闻", "热点榜"}},
+                {"netease_music", {"网易云音乐", "排行榜"}},
                 {"newsqq", {"腾讯新闻", "热点榜"}},
-                {"ngabbs", {"NGA论坛", "热帖"}},
+                {"qq_music", {"QQ音乐", "排行榜"}},
                 {"smth", {"水木社区", "十大话题"}},
                 {"sspai", {"少数派", "热榜"}},
                 {"thepaper", {"澎湃新闻", "热榜"}},
                 {"tieba", {"百度贴吧", "热议榜"}},
                 {"toutiao", {"今日头条", "热榜"}},
+                {"v2ex", {"v2ex论坛", "新帖"}},
                 {"weibo", {"微博", "热搜榜"}},
                 {"weread", {"微信读书", "飙升榜"}},
                 {"zhihu", {"知乎", "热榜"}},
@@ -325,9 +327,9 @@ std::string Newsfeed::GetTypeId(const std::string& src, int type_val) const
 
     if (src == "ckxx")
         type_str = m_ckxxChannels[type_val - 1];
-    else if (src == "netease_music_toplist")
+    else if (src == "netease_music")
         type_str = m_wyCategories[type_val - 1];
-    else if (src == "qq_music_toplist")
+    else if (src == "qq_music")
         type_str = m_qqCategories[type_val - 1];
     
     return type_str;

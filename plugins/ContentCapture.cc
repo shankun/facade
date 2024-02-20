@@ -37,6 +37,7 @@ void ContentCapture::shutdown()
 
 void ContentCapture::FetchToStorage(Json::Value srcList)
 {
+return;
     orm::DbClientPtr postgre = app().getDbClient("postgre");
     if (!postgre)
         return;
