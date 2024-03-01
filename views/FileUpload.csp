@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>文件上传</title>
+    <script type="text/javascript">
+        var xhr;
+        //File uploading method
+        function UploadFile() {
+            var fileObj = document.getElementById("file").files[0]; // js get file object
+            var url =  "/upload_endpoint"; 
+
+            var form = new FormData(); // FormData object
+            form.append("file", fileObj); // File object
+
+            xhr = new XMLHttpRequest();  // XMLHttpRequest object
+            xhr.open("post", url, true); //post
+            xhr.onload = uploadComplete; 
+            xhr.onerror = uploadFailed; 
+
+            xhr.upload.onprogress = progressFunction;
+            xhr.upload.onloadstart = function(){
+                ot = new Date().getTime();
+                oloaded = 0;
+            };
+
+            xhr.send(form); 
+        }
+
+        function uploadComplete(evt) {
+            var data = evt.target.responseText;
+            alert("File has been uploaded.\n" + data);
+        }
+        
+        function uploadFailed(evt) {
+            alert("Upload failed!");
+        }
+        
+        function cancelUploadFile(){
+            xhr.abort();
+        }
+
+        function progressFunction(evt) {
+            var progressBar = document.getElementById("progressBar");
+            var percentageDiv = document.getElementById("percentage");
+            if (evt.lengthComputable) {//
+                progressBar.max = evt.total;
+                progressBar.value = evt.loaded;
+                percentageDiv.innerHTML = Math.round(evt.loaded / evt.total * 100) + "%";
+            }
+            var time = document.getElementById("time");
+            var nt = new Date().getTime();
+            var pertime = (nt-ot)/1000; 
+            ot = new Date().getTime(); 
+            var perload = evt.loaded - oloaded; 
+            oloaded = evt.loaded;
+            var speed = perload/pertime;
+            var bspeed = speed;
+            var units = 'b/s';
+            if(speed/1024>1){
+                speed = speed/1024;
+                units = 'k/s';
+            }
+            if(speed/1024>1){
+                speed = speed/1024;
+                units = 'M/s';
+            }
+            speed = speed.toFixed(1);
+            var resttime = ((evt.total-evt.loaded)/bspeed).toFixed(1);
+            time.innerHTML = '，速度：'+speed+units+'，剩余时间：'+resttime+'秒';
+            if(bspeed==0) time.innerHTML = 'Upload cancelled';
+        }
+    </script>
+<style type="text/css">
+div{
+width: 960px;
+height: 540px;
+border:2px solid #fff;
+border-radius:8%;
+overflow: hidden;/* 这句是最主要的 可以使img显示在div的下面 */
+}
+div img{
+width: 960px;
+height: 540px;
+}
+</style>
+</head>
+<body>
+<div>
+<a href="/waterpool/index.html">
+<img alt="Aeolian" src="image/aeolian_arrow.jpg" ismap />
+</a>
+</div>
+<p>目前支持上传大小不超过1GB的文件，config.json中的client_max_body_size限制了文件大小。</p>
+<progress id="progressBar" value="0" max="100" style="width: 300px;"></progress>
+<span id="percentage"></span><span id="time"></span>
+<br /><br />
+<input type="file" id="file" name="myfile" />
+<input type="button" onclick="UploadFile()" value="上传" />
+<input type="button" onclick="cancelUploadFile()" value="取消" />
+</body>
+</html>

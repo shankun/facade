@@ -1,0 +1,6 @@
+[submodule "thirdParty/tree-sitter-html"]
+	path = thirdParty/tree-sitter-html
+	url = https://github.com/tree-sitter/tree-sitter-html.git
+[submodule "thirdParty/Beautiful-Soup-CPP"]
+	path = thirdParty/Beautiful-Soup-CPP
+	url = https://github.com/shankun/Beautiful-Soup-CPP.git
