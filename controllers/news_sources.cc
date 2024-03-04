@@ -1325,6 +1325,73 @@ Json::Value src_sspai::ParseData(const HttpResponsePtr& pResp) const
     return finalResp;
 }
 
+HttpRequestPtr src_solidot::CreateRequest(const drogon::HttpClientPtr& client) const
+{
+    return HttpRequest::newHttpRequest();
+}
+
+std::string src_solidot::srcURL() const
+{
+    return "https://www.solidot.org/index.rss";
+}
+
+Json::Value src_solidot::ParseData(const HttpResponsePtr& pResp) const
+{
+    Json::Value finalResp;
+    // 返回格式为text/xml
+    if ((pResp->contentType() != CT_APPLICATION_XML) || pResp->body().empty())
+    {
+        finalResp["code"] = static_cast<int>(k500InternalServerError);
+        finalResp["message"] = "solidot 返回内容格式错误！";
+        return finalResp;
+    }
+
+    pugi::xml_document doc;
+    pugi::xml_parse_result result = doc.load_string(pResp->body().data());
+    std::string strVal;
+    std::regex href("<[^>]+>");
+
+    if (result)
+    {
+        const std::string newLine = "\n";
+        pugi::xpath_node_set items = doc.select_nodes("/rss/channel/item");
+        for (pugi::xpath_node_set::const_iterator itr = items.begin(); 
+            itr != items.end(); ++itr)
+        {
+            Json::Value eachPost;
+            eachPost["title"] = itr->node().child_value("title");
+
+            strVal = itr->node().child_value("description");
+            // 删除文本中的超链接标记
+            std::string text =
+                std::regex_replace(strVal, href, std::string(" "));
+
+            size_t pos = text.find(newLine);
+            while (pos != text.npos)
+            {
+                text.replace(pos, newLine.length(), "");
+                pos = text.find(newLine);
+            }
+            
+            text.erase(0, text.find_first_not_of(' ')); // trim
+            text.erase(text.find_last_not_of(' ') + 1);
+            eachPost["desc"] = text;
+            eachPost["time"] = itr->node().child_value("pubDate");
+            strVal = itr->node().child_value("link");
+            eachPost["url"] = strVal;
+            eachPost["mobileUrl"] = eachPost["url"];
+            finalResp["data"].append(eachPost);
+        }
+    }
+    else
+    {
+        finalResp["code"] = static_cast<int>(result.status);
+        finalResp["message"] = result.description();
+    }
+
+    return finalResp;
+}
+
 HttpRequestPtr src_thepaper::CreateRequest(const drogon::HttpClientPtr& client) const
 {
     return HttpRequest::newHttpRequest();

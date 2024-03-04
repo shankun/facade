@@ -24,6 +24,7 @@ Newsfeed::Newsfeed()
                 {"qq_music", {"QQ音乐", "排行榜"}},
                 {"smth", {"水木社区", "十大话题"}},
                 {"sspai", {"少数派", "热榜"}},
+                {"solidot", {"Solidot", "最新资讯"}},
                 {"thepaper", {"澎湃新闻", "热榜"}},
                 {"tieba", {"百度贴吧", "热议榜"}},
                 {"toutiao", {"今日头条", "热榜"}},
