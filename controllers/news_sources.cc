@@ -1131,7 +1131,9 @@ HttpRequestPtr src_qq_music::CreateRequest(const drogon::HttpClientPtr& client) 
 
 std::string src_qq_music::srcURL() const
 {
-    return "https://y.qq.com/n/ryqq/toplist/" + m_parameter;
+    std::string url{"https://c.y.qq.com/v8/fcg-bin/fcg_v8_toplist_cp.fcg?topid="};
+    url += m_parameter + "&platform=yqq.json&jsonpCallback=MusicJsonCallbacktoplist";
+    return url;
 }
 
 Json::Value src_qq_music::ParseData(const HttpResponsePtr& pResp) const
@@ -1145,42 +1147,31 @@ Json::Value src_qq_music::ParseData(const HttpResponsePtr& pResp) const
         return finalResp;
     }
 
-    const std::string prefix{"window.__INITIAL_DATA__ ="};
+    const std::string_view prefix{"MusicJsonCallbacktoplist("};
+    std::size_t bgn = pResp->body().find(prefix);
     std::string htmlBody{pResp->body()};
     Json::Value root;
-    auto bgn = htmlBody.find(prefix);
-    if (bgn != std::string::npos)
+
+    if (bgn != std::string::npos && htmlBody.ends_with(')'))
     {
         bgn += prefix.length();
-        auto end = htmlBody.find("</script>", bgn);
-        if (end != std::string::npos && end > bgn)
+        size_t useful_len = htmlBody.length() - bgn - 1;
+
+        Json::CharReaderBuilder readFromstr;
+        std::string resp_str{htmlBody.substr(bgn, useful_len)};
+        std::replace(resp_str.begin(), resp_str.end(), '\n', ' ');
+        std::stringstream ss(resp_str);
+        std::string parseError;
+      
+        if (!Json::parseFromStream(readFromstr, ss, &root, &parseError))
         {
-            Json::CharReaderBuilder readFromstr;
-            std::string resp_str{htmlBody.substr(bgn, end - bgn)};
-
-            std::string invalidOne = "\"title_hilight\":undefined,";
-            std::string newStr = "\"title_hilight\":\"undefined\",";
-            std::string::size_type pos = 0;
-            // 替换所有指定子串
-            while((pos = resp_str.find(invalidOne)) != std::string::npos)
-                resp_str.replace(pos, invalidOne.length(), newStr);
-
-            std::ofstream fout;
-            fout.open("qqmusic.json", std::ios::app);
-            fout << resp_str;
-
-            std::stringstream ss(resp_str);
-            std::string parseError;
-            if (!Json::parseFromStream(readFromstr, ss, &root, &parseError))
-            {
-                finalResp["code"] = static_cast<int>(k500InternalServerError);
-                finalResp["message"] = "返回HTML中json块的格式错误！";
-                return finalResp;
-            }
+            finalResp["code"] = static_cast<int>(k500InternalServerError);
+            finalResp["message"] = "返回HTML中json块的格式错误！";
+            return finalResp;
         }
     }
 
-    if (false == root["songInfoList"].isArray())
+    if (false == root["songlist"].isArray())
     {
         finalResp["code"] = static_cast<int>(k500InternalServerError);
         finalResp["message"] = "解析json的内容错误，不是array！";
@@ -1188,39 +1179,31 @@ Json::Value src_qq_music::ParseData(const HttpResponsePtr& pResp) const
     }
 
     std::string val_str;
-    for (auto each : root["songInfoList"])
+    for (auto each : root["songlist"])
     {
         Json::Value song;
-        const std::string id_str{each["mid"].asString()};
+        const std::string id_str{each["data"]["songmid"].asString()};
         song["id"] = id_str;
-        
+ 
         std::string singers;
-        if (each["singer"].isArray())
+        if (each["data"]["singer"].isArray())
         {
-            for (auto itr = each["singer"].begin(); itr != each["singer"].end(); ++itr)
+            for (auto itr = each["data"]["singer"].begin(); itr != each["data"]["singer"].end(); ++itr)
             {
-                if (itr != each["singer"].begin())
+                if (itr != each["data"]["singer"].begin())
                     singers += " & ";
                 
                 singers += (*itr)["name"].asString();
             }
         }
 
-        val_str = each["title"].asString();
-        if (each["subtitle"].asString().empty() == false)
-            val_str += " " + each["subtitle"].asString();
+        val_str = each["data"]["songname"].asString();
         
         if (singers.empty() == false)
             val_str += " - " + singers;
 
         song["title"] = val_str;
-        val_str = each["coverUrl"].asString();
-        val_str = "https:" + dailyhot::UnEscape(val_str);
-        size_t tail = val_str.find("?max_age");
-        if (tail != std::string::npos)
-            val_str = val_str.substr(0, tail);
-
-        song["pic"] = val_str;
+        song["hot"] = each["Franking_value"].asString();
         song["url"] = "https://y.qq.com/n/ryqq/songDetail/" + id_str;
         song["mobileUrl"] = song["url"];
         finalResp["data"].append(song);
