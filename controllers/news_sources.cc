@@ -1212,6 +1212,91 @@ Json::Value src_qq_music::ParseData(const HttpResponsePtr& pResp) const
     return finalResp;
 }
 
+HttpRequestPtr src_sina::CreateRequest(const drogon::HttpClientPtr& client) const
+{
+    client->setUserAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36 Edg/114.0.1823.67");
+    return HttpRequest::newHttpRequest();
+}
+
+std::string src_sina::srcURL() const
+{
+    std::string url{"https://top.news.sina.com.cn/ws/GetTopDataList.php?top_type=day&top_cat="};
+    bool local = (trantor::Date::now().microSecondsSinceEpoch() % 2 == 0);
+    url += local ? "news_china_suda" : "news_world_suda";
+    url += "&top_time=today&top_show_num=20&top_order=DESC&short_title=1&js_var=hotNewsData";
+    return url;
+}
+
+Json::Value src_sina::ParseData(const HttpResponsePtr& pResp) const
+{
+    Json::Value finalResp;
+    // 返回格式为text/html
+    if ((pResp->contentType() != CT_TEXT_HTML) || pResp->body().empty())
+    {
+        finalResp["code"] = static_cast<int>(k500InternalServerError);
+        finalResp["message"] = "新浪新闻返回内容格式错误！";
+        return finalResp;
+    }
+
+    const std::string prefix{"\"data\":["};
+    std::string htmlBody{pResp->body()};
+    Json::Value root;
+    auto bgn = htmlBody.find(prefix);
+
+    if (bgn != std::string::npos)
+    {
+        bgn += prefix.length() - 1;
+        auto end = htmlBody.rfind("};");
+
+        if (end != std::string::npos && end > bgn)
+        {
+            Json::CharReaderBuilder readFromstr;
+            std::stringstream ss(htmlBody.substr(bgn, end - bgn));
+            std::string parseError;
+            if (!Json::parseFromStream(readFromstr, ss, &root, &parseError))
+            {
+                finalResp["code"] = static_cast<int>(k500InternalServerError);
+                finalResp["message"] = "返回HTML中json块的格式错误！";
+                return finalResp;
+            }
+        }
+    }
+
+    if (false == root.isArray())
+    {
+        finalResp["code"] = static_cast<int>(k500InternalServerError);
+        finalResp["message"] = "解析json的内容错误，不是array！";
+        return finalResp;
+    }
+
+    const std::string sp{"\\/"};
+    std::string val_str;
+    for (auto each : root)
+    {
+        Json::Value item;
+        item["id"] = each["id"].asString();
+        // 十六进制编码字符串转中文
+        val_str = UnEscape(each["title"].asString());
+        item["title"] = val_str;
+        item["desc"] = val_str;
+        val_str = each["url"].asString();
+
+        size_t pos = val_str.find(sp);
+        while (pos != val_str.npos)
+        {
+            val_str.replace(pos, sp.length(), "/");
+            pos = val_str.find(sp);
+        }
+
+        item["url"] = val_str;
+        item["mobileUrl"] = val_str;
+        item["hot"] = each["top_num"].asString();
+        finalResp["data"].append(item);
+    }
+
+    return finalResp;
+}
+
 HttpRequestPtr src_smth::CreateRequest(const drogon::HttpClientPtr& client) const
 {
     return HttpRequest::newHttpRequest();
