@@ -1,3 +1,5 @@
+#include <fstream>
+#include <random>
 #include "dailyhot_Newsfeed.h"
 #include "news_sources.h"
 #include <drogon/utils/coroutine.h>
@@ -87,7 +89,12 @@ Task<> Newsfeed::GetHotList(HttpRequestPtr req,
         auto resp = HttpResponse::newHttpJsonResponse(content);
         callback(resp);
         co_return;
-    }    
+    }
+    else if (source == "hitokoto")
+    {
+        callback(PickHitokoto());
+        co_return;
+    }
 
     if (m_allNewsSrc.find(source) == m_allNewsSrc.end())
     {
@@ -346,4 +353,39 @@ std::string Newsfeed::GetTypeId(const std::string& src, int type_val) const
         type_str = m_qqCategories[type_val - 1];
     
     return type_str;
+}
+
+HttpResponsePtr Newsfeed::PickHitokoto() const
+{
+    const std::string path = app().getCustomConfig()["hitokoto_storage"].asString();
+    int min = static_cast<int>('a');
+    int max = static_cast<int>('l');
+    std::random_device seed; // 硬件生成随机数种子
+	std::ranlux48 engine(seed()); // 利用种子生成随机数引擎
+    std::uniform_int_distribution<> distrib(min, max); // 设置随机数范围，并为均匀分布
+    char random = static_cast<char>(distrib(engine));
+    Json::Value content;
+    std::string file = path + random + ".json";
+    std::ifstream fReader(file, std::ios::binary);
+    if (!fReader.is_open())
+    {
+        content["code"] = static_cast<int>(k500InternalServerError);
+        content["message"] = "打开文件失败！";
+        return HttpResponse::newHttpJsonResponse(content);
+    }
+
+    Json::Reader reader;
+    Json::Value value;
+    if (!reader.parse(fReader, value) || value.empty() || value.isArray() == false)
+    {
+        content["code"] = static_cast<int>(k500InternalServerError);
+        content["message"] = "解析文件失败！";
+    }
+    else
+    {
+        std::uniform_int_distribution<> distribut(0, value.size() - 1);
+        content = value[distribut(engine)];
+    }
+
+    return HttpResponse::newHttpJsonResponse(content);
 }

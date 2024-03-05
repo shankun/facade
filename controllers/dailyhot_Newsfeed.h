@@ -48,6 +48,9 @@ class Newsfeed : public HttpController<Newsfeed>
 
     std::string GetTypeId(const std::string& src, int type_val) const;
 
+    // 从本地数据中随机读取一条一言
+    HttpResponsePtr PickHitokoto() const;
+
     // 所有新闻来源
     const std::map<std::string, std::pair<std::string, std::string> > m_allNewsSrc;
 

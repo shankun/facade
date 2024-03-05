@@ -9,6 +9,11 @@
 
 using namespace drogon;
 
+namespace trantor
+{
+  class EventLoop;
+}
+
 class ContentCapture : public Plugin<ContentCapture>
 {
   public:
@@ -23,9 +28,14 @@ class ContentCapture : public Plugin<ContentCapture>
   
   private:
 
+    // 更新下载一言数据包
+    void DownloadHitokoto(const std::string& siteAddress, const std::string& repo);
+
     // 获取内容并存入redis
     void FetchToStorage(Json::Value srcList);
 
+    uint64_t m_downloadTimerId;
     uint64_t m_workTimerId;
+    trantor::EventLoop *m_pEvLoop;
 };
 
