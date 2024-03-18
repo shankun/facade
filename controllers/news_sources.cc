@@ -376,9 +376,10 @@ Json::Value src_douban::ParseData(const HttpResponsePtr& pResp) const
             if (!found)
                 continue;
 
+            std::string rate;
             const TagNode& rating = parser.find(movie, "span", {{"class", "rating_nums"}}, found);
             if (found)
-                eachMovie["score"] = parser.getNodeText(rating);
+                rate = parser.getNodeText(rating);
 
             const TagNode& comment_num = parser.find(movie, "span", {{"class", "pl"}}, found);
             if (found)
@@ -396,7 +397,7 @@ Json::Value src_douban::ParseData(const HttpResponsePtr& pResp) const
             const TagNode& title_a = parser.find(movie, "a", found);
             if (found)
             {
-                std::string title = std::format("[★{}] ", eachMovie["score"].asCString());
+                std::string title = std::format("[★{}] ", rate);
                 strVal = parser.getNodeText(title_a);
                 strVal = std::regex_replace(strVal, std::regex(R"(\s+)"), " ");
                 title += strVal;
