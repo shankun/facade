@@ -17,6 +17,7 @@ Newsfeed::Newsfeed()
                 {"douyin", {"抖音", "热点榜"}},
                 {"douyin_music", {"抖音", "热歌榜"}},
                 {"github", {"Github", "Trending"}},
+                {"hupu", {"虎扑步行街", "24小时榜"}},
                 {"ithome", {"IT之家", "热榜"}},
                 {"juejin", {"稀土掘金", "热榜"}},
                 {"kuaishou", {"快手", "热榜"}},

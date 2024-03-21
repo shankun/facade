@@ -719,6 +719,78 @@ Json::Value src_github::ParseData(const HttpResponsePtr& pResp) const
     return finalResp;
 }
 
+HttpRequestPtr src_hupu::CreateRequest(const drogon::HttpClientPtr& client) const
+{
+    auto pReq = HttpRequest::newHttpRequest();
+    pReq->addHeader("Referer", "https://bbs.hupu.com/topic-daily");
+    client->setUserAgent("Mozilla/5.0 (iPhone; CPU iPhone OS 15_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/15.0 Mobile/15E148 Safari/604.1");
+    return pReq;
+}
+
+std::string src_hupu::srcURL() const
+{
+    return "https://bbs.hupu.com/topic-daily-hot";
+}
+
+Json::Value src_hupu::ParseData(const HttpResponsePtr& pResp) const
+{
+    Json::Value finalResp;
+    // 返回格式为text/html
+    if ((pResp->contentType() != CT_TEXT_HTML) || pResp->body().empty())
+    {
+        finalResp["code"] = static_cast<int>(k500InternalServerError);
+        finalResp["message"] = "虎扑 返回内容格式错误！";
+        return finalResp;
+    }
+
+    Json::Value root;
+    const std::string htmlBody = pResp->body().data();
+    const std::string dataStart{"window.$$data={"};
+    auto bgn = htmlBody.find(dataStart);
+    if (bgn != std::string::npos)
+    {
+        bgn += dataStart.length() - 1;
+        auto end = htmlBody.find("</script>", bgn);
+        if (end != std::string::npos && end > bgn)
+        {
+            Json::CharReaderBuilder readFromstr;
+            std::stringstream ss(htmlBody.substr(bgn, end - bgn));
+            std::string parseError;
+            if (!Json::parseFromStream(readFromstr, ss, &root, &parseError))
+            {
+                finalResp["code"] = static_cast<int>(k500InternalServerError);
+                finalResp["message"] = "返回HTML中json块的格式错误！";
+                return finalResp;
+            }
+        }
+    }
+    
+    Json::Value topicList = root["topic"]["threads"]["list"];
+    if (false == topicList.isArray())
+    {
+        finalResp["code"] = static_cast<int>(k500InternalServerError);
+        finalResp["message"] = "解析list的内容错误！";
+        return finalResp;
+    }
+
+    std::string val_str;
+    for (auto each : topicList)
+    {
+        Json::Value item;
+        const std::string id_str{each["tid"].asString()};
+        item["id"] = id_str;
+        item["title"] = each["title"].asString();
+        item["hot"] = each["read"].asInt();
+        item["time"] = each["createdAtFormat"].asString();
+        val_str = each["url"].asString();
+        item["url"] = "https://bbs.hupu.com" + val_str;
+        item["mobileUrl"] = item["url"];
+        finalResp["data"].append(item);
+    }
+
+    return finalResp;
+}
+
 HttpRequestPtr src_ithome::CreateRequest(const drogon::HttpClientPtr& client) const
 {
     client->setUserAgent("Mozilla/5.0 (iPhone; CPU iPhone OS 15_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/15.0 Mobile/15E148 Safari/604.1");
@@ -1619,7 +1691,7 @@ HttpRequestPtr src_v2ex::CreateRequest(const drogon::HttpClientPtr& client) cons
 
 std::string src_v2ex::srcURL() const
 {
-    return "https://gh.shankun.xyz/https://machbbs.com/v2ex/?tab=hot";
+    return "https://gh.shankun.xyz/https://v2ex.com";
 }
 
 Json::Value src_v2ex::ParseData(const HttpResponsePtr& pResp) const
@@ -1640,7 +1712,7 @@ Json::Value src_v2ex::ParseData(const HttpResponsePtr& pResp) const
     try
     {
         BeautifulSoup parser(resp_str);
-        auto subjects = parser.find_all("div", {{"class", "media-body"}});
+        auto subjects = parser.find_all("span", {{"class", "item_hot_topic_title"}});
 
         for(const TagNode& subject : subjects)
         {
@@ -1654,18 +1726,6 @@ Json::Value src_v2ex::ParseData(const HttpResponsePtr& pResp) const
             eachSubject["url"] = link["href"];
 
             eachSubject["mobileUrl"] = link["href"];
-            const TagNode& userName = parser.find(subject, "span", found);
-            if (found)
-            {
-                eachSubject["member"] = parser.getNodeText(userName);
-                eachSubject["time"] = parser.getNodeText(userName.getNextSibling());
-            }
-
-            const TagNode& commentNum = parser.find(link.getNextSibling(), "span", 
-                                        {{"class", "ml-2"}}, found);
-            if (found)
-                eachSubject["comments"] = parser.getNodeText(commentNum);
-            
             finalResp["data"].append(eachSubject);
         }
     }
