@@ -721,10 +721,8 @@ Json::Value src_github::ParseData(const HttpResponsePtr& pResp) const
 
 HttpRequestPtr src_hupu::CreateRequest(const drogon::HttpClientPtr& client) const
 {
-    auto pReq = HttpRequest::newHttpRequest();
-    pReq->addHeader("Referer", "https://bbs.hupu.com/topic-daily");
-    client->setUserAgent("Mozilla/5.0 (iPhone; CPU iPhone OS 15_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/15.0 Mobile/15E148 Safari/604.1");
-    return pReq;
+    client->setUserAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36 Edg/114.0.1823.67");
+    return HttpRequest::newHttpRequest();
 }
 
 std::string src_hupu::srcURL() const
