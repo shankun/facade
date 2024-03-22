@@ -833,7 +833,7 @@ Json::Value src_huxiu::ParseData(const HttpResponsePtr& pResp) const
         }
     }
     
-    Json::Value articles = root["channel"]["channels"]["datalist"];
+    Json::Value articles = root["channel"]["hotArticles"];
     if (false == articles.isArray())
     {
         finalResp["code"] = static_cast<int>(k500InternalServerError);
@@ -841,7 +841,7 @@ Json::Value src_huxiu::ParseData(const HttpResponsePtr& pResp) const
         return finalResp;
     }
 
-    std::string mAddress{"m.huxiu.com"};
+    std::string mAddress{"www.huxiu.com"};
     std::string val_str;
     for (auto each : articles)
     {
@@ -856,11 +856,13 @@ Json::Value src_huxiu::ParseData(const HttpResponsePtr& pResp) const
         item["title"] = val_str;
         item["pic"] = each["pic_path"].asString();
         item["hot"] = each["count_info"]["favtimes"].asInt();
-        item["time"] = each["formatDate"].asString();
+        int64_t elapsed = std::strtol(each["dateline"].asCString(), nullptr, 10);
+        trantor::Date publishTime(elapsed);
+        item["time"] = publishTime.toDbStringLocal();
         val_str = each["url"].asString();
-        item["mobileUrl"] = val_str;
-        val_str.replace(val_str.find(mAddress), mAddress.length(), "www.huxiu.com");
         item["url"] = val_str;
+        val_str.replace(val_str.find(mAddress), mAddress.length(), "m.huxiu.com");
+        item["mobileUrl"] = val_str;
         finalResp["data"].append(item);
     }
 
