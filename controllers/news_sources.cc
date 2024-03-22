@@ -789,6 +789,84 @@ Json::Value src_hupu::ParseData(const HttpResponsePtr& pResp) const
     return finalResp;
 }
 
+HttpRequestPtr src_huxiu::CreateRequest(const drogon::HttpClientPtr& client) const
+{
+    client->setUserAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36 Edg/114.0.1823.67");
+    return HttpRequest::newHttpRequest();
+}
+
+std::string src_huxiu::srcURL() const
+{
+    return "https://www.huxiu.com/article/";
+}
+
+Json::Value src_huxiu::ParseData(const HttpResponsePtr& pResp) const
+{
+    Json::Value finalResp;
+    // 返回格式为text/html
+    if ((pResp->contentType() != CT_TEXT_HTML) || pResp->body().empty())
+    {
+        finalResp["code"] = static_cast<int>(k500InternalServerError);
+        finalResp["message"] = "虎嗅 返回内容格式错误！";
+        return finalResp;
+    }
+
+    Json::Value root;
+    const std::string htmlBody = pResp->body().data();
+    const std::string dataStart{"window.__INITIAL_STATE__={"};
+    auto bgn = htmlBody.find(dataStart);
+    if (bgn != std::string::npos)
+    {
+        bgn += dataStart.length() - 1;
+        auto end = htmlBody.find(";(function(){var s;", bgn);
+        if (end != std::string::npos && end > bgn)
+        {
+            Json::CharReaderBuilder readFromstr;
+            std::stringstream ss(htmlBody.substr(bgn, end - bgn));
+            std::string parseError;
+            if (!Json::parseFromStream(readFromstr, ss, &root, &parseError))
+            {
+                finalResp["code"] = static_cast<int>(k500InternalServerError);
+                finalResp["message"] = "返回HTML中json块的格式错误！";
+                return finalResp;
+            }
+        }
+    }
+    
+    Json::Value articles = root["articleListModule"]["articles"]["dataList"];
+    if (false == articles.isArray())
+    {
+        finalResp["code"] = static_cast<int>(k500InternalServerError);
+        finalResp["message"] = "解析list的内容错误！";
+        return finalResp;
+    }
+
+    std::string mAddress{"m.huxiu.com"};
+    std::string val_str;
+    for (auto each : articles)
+    {
+        Json::Value item;
+        const std::string id_str{each["aid"].asString()};
+        item["id"] = id_str;
+        val_str = each["title"].asString();
+        std::string from = each["user_info"]["username"].asString();
+        if (!from.empty())
+            val_str += " - " + from;
+
+        item["title"] = val_str;
+        item["pic"] = each["pic_path"].asString();
+        item["hot"] = each["count_info"]["viewnum"].asInt();
+        item["time"] = each["formatDate"].asString();
+        val_str = each["share_url"].asString();
+        item["mobileUrl"] = val_str;
+        val_str.replace(val_str.find(mAddress), mAddress.length(), "www.huxiu.com");
+        item["url"] = val_str;
+        finalResp["data"].append(item);
+    }
+
+    return finalResp;
+}
+
 HttpRequestPtr src_ithome::CreateRequest(const drogon::HttpClientPtr& client) const
 {
     client->setUserAgent("Mozilla/5.0 (iPhone; CPU iPhone OS 15_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/15.0 Mobile/15E148 Safari/604.1");
