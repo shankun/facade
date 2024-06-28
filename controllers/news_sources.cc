@@ -961,6 +961,49 @@ Json::Value src_ithome::ParseData(const HttpResponsePtr& pResp) const
     return finalResp;
 }
 
+HttpRequestPtr src_jianshu::CreateRequest(const drogon::HttpClientPtr& client) const
+{
+    return HttpRequest::newHttpRequest();
+}
+
+std::string src_jianshu::srcURL() const
+{
+    return "https://www.jianshu.com/programmers?page=1&type_id=27&count=20";
+}
+
+Json::Value src_jianshu::ParseData(const HttpResponsePtr& pResp) const
+{
+    Json::Value finalResp;
+
+    if ((pResp->contentType() != CT_APPLICATION_JSON) || 
+        !(pResp->jsonObject()))
+    {
+        finalResp["code"] = static_cast<int>(k500InternalServerError);
+        finalResp["message"] = "简书后端技术 返回内容格式错误！";
+        return finalResp;
+    }
+
+    std::string val_str;
+    const Json::Value& root = *(pResp->jsonObject());
+    if (root.isArray())
+    {
+        for (auto each : root)
+        {
+            Json::Value item;
+            item["id"] = each["id"];
+            item["title"] = each["title"];
+            item["author"] = each["user"]["nickname"];
+            item["hot"] = each["views_count"];
+            val_str = "https://www.jianshu.com/p/" + each["slug"].asString();
+            item["url"] = val_str;
+            item["mobileUrl"] = val_str;
+            finalResp["data"].append(item);
+        }
+    }
+
+    return finalResp;
+}
+
 HttpRequestPtr src_juejin::CreateRequest(const drogon::HttpClientPtr& client) const
 {
     return HttpRequest::newHttpRequest();
