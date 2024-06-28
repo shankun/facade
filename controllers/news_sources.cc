@@ -48,7 +48,6 @@ Json::Value src_36kr::ParseData(const HttpResponsePtr& pResp) const
             item["pic"] = each["templateMaterial"]["widgetImage"];
             item["owner"] = each["templateMaterial"]["authorName"];
             item["hot"] = each["templateMaterial"]["statRead"];
-            item["data"] = each["templateMaterial"];
             item["url"] = "https://www.36kr.com/p/" + each["itemId"].asString();
             item["mobileUrl"] = "https://m.36kr.com/p/" + each["itemId"].asString();
             finalResp["data"].append(item);
@@ -833,7 +832,7 @@ Json::Value src_huxiu::ParseData(const HttpResponsePtr& pResp) const
         }
     }
     
-    Json::Value articles = root["channel"]["hotArticles"];
+    Json::Value articles = root["channel"]["channels"]["datalist"];
     if (false == articles.isArray())
     {
         finalResp["code"] = static_cast<int>(k500InternalServerError);
