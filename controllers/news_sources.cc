@@ -200,7 +200,7 @@ HttpRequestPtr src_calendar::CreateRequest(const drogon::HttpClientPtr& client) 
 
 std::string src_calendar::srcURL() const
 {
-    const std::string month = trantor::Date::now().toCustomedFormattedStringLocal("%m");
+    const std::string month = trantor::Date::now().toCustomFormattedStringLocal("%m");
     std::string url = "https://baike.baidu.com/cms/home/eventsOnHistory/" + month;
     url += ".json";
     return url;
@@ -224,7 +224,7 @@ Json::Value src_calendar::ParseData(const HttpResponsePtr& pResp) const
         month = itr.key().asString();
 
     const std::string date = m_parameter.empty() ?
-     trantor::Date::now().toCustomedFormattedStringLocal("%m%d") : m_parameter;
+     trantor::Date::now().toCustomFormattedStringLocal("%m%d") : m_parameter;
 
     if (root[month][date].isArray())
     {
