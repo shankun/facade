@@ -664,13 +664,13 @@ Json::Value src_github::ParseData(const HttpResponsePtr& pResp) const
             const TagNode& a_tag = parser.find(articleH2, "a", found);
             if (!found)
                 continue;
-            
+
             strVal = a_tag["href"];
             Json::Value eachProj;
             if (strVal.starts_with(proxyPrefix))
                 strVal = strVal.substr(proxyPrefix.length());
 
-            eachProj["title"] = strVal;
+            std::string projname = strVal;
             eachProj["url"] = prefix + strVal;
             strVal.clear();
             const TagNode& article_p = parser.find(article, "p", found);
@@ -678,6 +678,7 @@ Json::Value src_github::ParseData(const HttpResponsePtr& pResp) const
                 strVal = parser.getNodeText(article_p);
 
             eachProj["desc"] = strVal;
+            eachProj["title"] = projname + ": " + strVal;
             strVal.clear();
             const Node& div_f6 = found ? article_p.getNextSibling() : articleH2.getNextSibling();
             const TagNode& lang = parser.find(div_f6, "span", 
