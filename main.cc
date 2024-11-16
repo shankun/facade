@@ -62,7 +62,7 @@ int main()
 //    app().addListener("0.0.0.0",443) //Set HTTP listener address and port
 //       .setClientMaxBodySize(20 * 2000 * 2000);
 
-    app().loadConfigFile("../config.json")  //Load config file
+    app().loadConfigFile("./facade_config.json")  //Load config file
     .run();
     //Run HTTP framework,the method will block in the internal event loop
     return 0;

@@ -150,7 +150,7 @@
         //session_max_age: The max age of the session cookie, -1 by default
         "session_max_age": -1,
         //document_root: Root path of HTTP document, defaut path is ./
-        "document_root": "/var/www/dynamic",
+        "document_root": "/srv/http/dynamic",
         //home_page: Set the HTML file of the home page, the default value is "index.html"
         //If there isn't any handler registered to the path "/", the home page file in the "document_root" is send to clients as a response
         //to the request for "/".
@@ -266,7 +266,7 @@
                 //presents an absolute path, otherwise it presents a relative path to 
                 //the document_root path. 
                 //The default value is "" which means use the document root path as the location base path.
-                "alias": "/var/www/static/microblogs/public",
+                "alias": "/srv/http/static/microblogs/public",
                 //is_case_sensitive: indicates whether the URI prefix is case sensitive.
                 "is_case_sensitive": false,
                 //allow_all: true by default. If it is set to false, only static files with a valid extension can be accessed.
@@ -279,7 +279,7 @@
 	    {
                 "uri_prefix": "/blog",
                 "default_content_type": "text/html",
-                "alias": "/var/www/static/shankun.github.io/public",
+                "alias": "/srv/http/static/shankun.github.io/public",
                 "is_case_sensitive": false,
                 "allow_all": true,
                 "is_recursive": true,
@@ -288,7 +288,7 @@
 	    {
                 "uri_prefix": "/dailyhot",
                 "default_content_type": "text/html",
-                "alias": "/var/www/static/dailyhot",
+                "alias": "/srv/http/static/dailyhot",
                 "is_case_sensitive": false,
                 "allow_all": true,
                 "is_recursive": true,
@@ -484,7 +484,7 @@
     ],
     //custom_config: custom configuration for users. This object can be get by the app().getCustomConfig() method. 
     "custom_config": {
-        "hitokoto_storage": "/var/www/dynamic/data/hitokoto/",
+        "hitokoto_storage": "/srv/http/dynamic/data/hitokoto/",
         "realm": "drogonRealm",
         "opaque": "drogonOpaque",
         "credentials": [
