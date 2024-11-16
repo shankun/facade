@@ -664,8 +664,8 @@ Json::Value src_github::ParseData(const HttpResponsePtr& pResp) const
 
             strVal = a_tag["href"];
             Json::Value eachProj;
-            if (strVal.starts_with(prefix))
-                strVal = strVal.substr(prefix.length());
+            if (strVal.starts_with("/"))
+                strVal = strVal.substr(1);
 
             std::string projname = strVal;
             eachProj["url"] = prefix + strVal;
@@ -1826,7 +1826,7 @@ Json::Value src_v2ex::ParseData(const HttpResponsePtr& pResp) const
     std::string strVal;
     std::string resp_str{pResp->body()};
     std::replace(resp_str.begin(), resp_str.end(), '\n',' ');
-
+    const std::string prefix("https://gh.shankun.tech/https://v2ex.com/");
     try
     {
         BeautifulSoup parser(resp_str);
@@ -1841,7 +1841,7 @@ Json::Value src_v2ex::ParseData(const HttpResponsePtr& pResp) const
                 continue;
 
             eachSubject["title"] = parser.getNodeText(link);
-            eachSubject["url"] = link["href"];
+            eachSubject["url"] = prefix + link["href"];
 
             eachSubject["mobileUrl"] = link["href"];
             finalResp["data"].append(eachSubject);
