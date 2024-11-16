@@ -4,8 +4,8 @@
     //ssl:The global SSL settings. "key" and "cert" are the path to the SSL key and certificate. While
     //    "conf" is an array of 1 or 2-element tuples that supplies file style options for `SSL_CONF_cmd`.
     "ssl": {
-        "cert": "/home/sk/web/facade/cert/shankun.tech.pem",
-        "key": "/home/sk/web/facade/cert/shankun.tech.key",
+        "cert": "",
+        "key": "",
         "conf": [
             ["Options", "-SessionTicket"], 
             ["Options", "Compression"]
@@ -50,28 +50,28 @@
     "application/octet-stream": [ "ppt", "pptx", "xls", "xlsx", "epub", "mobi", "dds", "b3dm", "i3dm", "cmpt", "pnts", "7z", "zip", "dat", "bin", "gz", "exe", "dll", "iso", "msi", "msp", "msm", "msu", "mdb", "fdb", "max", "rvt", "dmp", "him", "zst" , "tar" ]
   },
     "listeners": [
-//        {
-//            //address: Ip address,0.0.0.0 by default
-//            "address": "0.0.0.0",
-//            //port: Port number
-//            "port": 8080,
-//            //https: If true, use https for security,false by default
-//            "https": false
-//        },
         {
+            //address: Ip address,0.0.0.0 by default
             "address": "0.0.0.0",
-            "port": 443,
-            "https": true,
+            //port: Port number
+            "port": 80,
+//            //https: If true, use https for security,false by default
+            "https": false
+        },
+//        {
+//            "address": "0.0.0.0",
+//            "port": 443,
+//            "https": true,
             //cert,key: Cert file path and key file path, empty by default,
             //if empty, use the global setting
-            "cert": "",
-            "key": "",
+//            "cert": "",
+//            "key": "",
             //use_old_tls: enable the TLS1.0/1.1, false by default
-            "use_old_tls": false,
-            "ssl_conf": [
-                ["MinProtocol", "TLSv1.2"]
-            ]
-        }
+//            "use_old_tls": false,
+//            "ssl_conf": [
+//                ["MinProtocol", "TLSv1.2"]
+//            ]
+//        }
     ],
 
 /*    "db_clients": [
