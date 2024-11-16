@@ -1826,7 +1826,7 @@ Json::Value src_v2ex::ParseData(const HttpResponsePtr& pResp) const
     std::string strVal;
     std::string resp_str{pResp->body()};
     std::replace(resp_str.begin(), resp_str.end(), '\n',' ');
-    const std::string prefix("https://gh.shankun.tech/https://v2ex.com/");
+    const std::string prefix("https://gh.shankun.tech/https://v2ex.com");
     try
     {
         BeautifulSoup parser(resp_str);
@@ -1843,7 +1843,7 @@ Json::Value src_v2ex::ParseData(const HttpResponsePtr& pResp) const
             eachSubject["title"] = parser.getNodeText(link);
             eachSubject["url"] = prefix + link["href"];
 
-            eachSubject["mobileUrl"] = link["href"];
+            eachSubject["mobileUrl"] = eachSubject["url"];
             finalResp["data"].append(eachSubject);
         }
     }
