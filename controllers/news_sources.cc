@@ -625,7 +625,7 @@ HttpRequestPtr src_github::CreateRequest(const drogon::HttpClientPtr& client) co
 
 std::string src_github::srcURL() const
 {
-    return "https://gh.shankun.tech/https://github.com/trending";
+    return "https://github.com/trending";
 }
 
 Json::Value src_github::ParseData(const HttpResponsePtr& pResp) const
@@ -640,9 +640,6 @@ Json::Value src_github::ParseData(const HttpResponsePtr& pResp) const
     }
 
     const std::string prefix{"https://github.com/"};
-    // 阿里云ECS无法访问github.com，需要通过cloudflare代理。
-    // 但代理脚本会将html中所有链接加上前缀，因此应该删除前缀。
-    const std::string proxyPrefix{"https://gh.shankun.tech/https%3A%2F%2Fgithub.com%2F"};
     std::string strVal;
 //    std::regex white_spaces(R"(/(^\s*)|(\s*$)/g)");
 
@@ -667,8 +664,8 @@ Json::Value src_github::ParseData(const HttpResponsePtr& pResp) const
 
             strVal = a_tag["href"];
             Json::Value eachProj;
-            if (strVal.starts_with(proxyPrefix))
-                strVal = strVal.substr(proxyPrefix.length());
+            if (strVal.starts_with(prefix))
+                strVal = strVal.substr(prefix.length());
 
             std::string projname = strVal;
             eachProj["url"] = prefix + strVal;
@@ -1500,7 +1497,7 @@ std::string src_smth::srcURL() const
 {
     // 直接从阿里云访问报错：您的ksbj-IP因为访问过于频繁，已被系统封禁
     // 因此使用代理转发
-    return "https://gh.shankun.tech/https://www.newsmth.net/nForum/rss/topten";
+    return "https://www.newsmth.net/nForum/rss/topten";
 }
 
 Json::Value src_smth::ParseData(const HttpResponsePtr& pResp) const
@@ -1812,7 +1809,7 @@ HttpRequestPtr src_v2ex::CreateRequest(const drogon::HttpClientPtr& client) cons
 
 std::string src_v2ex::srcURL() const
 {
-    return "https://gh.shankun.tech/https://v2ex.com";
+    return "https://v2ex.com";
 }
 
 Json::Value src_v2ex::ParseData(const HttpResponsePtr& pResp) const

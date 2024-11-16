@@ -444,7 +444,7 @@
             //"dependencies": [],
             //config: The configuration of the plugin. This json object is the parameter to initialize the plugin.
             "config": {
-                "hitokoto_url": "https://gh.shankun.tech/https://raw.githubusercontent.com/hitokoto-osc/sentences-bundle/master/sentences/",
+                "hitokoto_url": "https://raw.githubusercontent.com/hitokoto-osc/sentences-bundle/master/sentences/",
                 "sources": [
                     {
                         "key": "hitokoto",
