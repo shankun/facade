@@ -4,8 +4,8 @@
     //ssl:The global SSL settings. "key" and "cert" are the path to the SSL key and certificate. While
     //    "conf" is an array of 1 or 2-element tuples that supplies file style options for `SSL_CONF_cmd`.
     "ssl": {
-        "cert": "",
-        "key": "",
+        "cert": "/etc/nginx/ssl/shankun.tech.pem",
+        "key": "/etc/nginx/ssl/shankun.tech.key",
         "conf": [
             ["Options", "-SessionTicket"], 
             ["Options", "Compression"]
@@ -50,28 +50,28 @@
     "application/octet-stream": [ "ppt", "pptx", "xls", "xlsx", "epub", "mobi", "dds", "b3dm", "i3dm", "cmpt", "pnts", "7z", "zip", "dat", "bin", "gz", "exe", "dll", "iso", "msi", "msp", "msm", "msu", "mdb", "fdb", "max", "rvt", "dmp", "him", "zst" , "tar" ]
   },
     "listeners": [
-        {
-            //address: Ip address,0.0.0.0 by default
-            "address": "0.0.0.0",
-            //port: Port number
-            "port": 80,
-//            //https: If true, use https for security,false by default
-            "https": false
-        },
 //        {
+            //address: Ip address,0.0.0.0 by default
 //            "address": "0.0.0.0",
-//            "port": 443,
-//            "https": true,
+            //port: Port number
+//            "port": 80,
+//            //https: If true, use https for security,false by default
+//            "https": false
+//        }
+        {
+            "address": "0.0.0.0",
+            "port": 443,
+            "https": true,
             //cert,key: Cert file path and key file path, empty by default,
             //if empty, use the global setting
-//            "cert": "",
-//            "key": "",
+            "cert": "",
+            "key": "",
             //use_old_tls: enable the TLS1.0/1.1, false by default
-//            "use_old_tls": false,
-//            "ssl_conf": [
-//                ["MinProtocol", "TLSv1.2"]
-//            ]
-//        }
+            "use_old_tls": false,
+            "ssl_conf": [
+                ["MinProtocol", "TLSv1.2"]
+            ]
+        }
     ],
 
 /*    "db_clients": [
@@ -289,6 +289,15 @@
                 "uri_prefix": "/dailyhot",
                 "default_content_type": "text/html",
                 "alias": "/srv/http/static/dailyhot",
+                "is_case_sensitive": false,
+                "allow_all": true,
+                "is_recursive": true,
+                "filters": []
+	    },
+	    {
+                "uri_prefix": "/rustbook",
+                "default_content_type": "text/html",
+                "alias": "/srv/http/static/rustbook",
                 "is_case_sensitive": false,
                 "allow_all": true,
                 "is_recursive": true,

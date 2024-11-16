@@ -28,7 +28,7 @@ int main()
                 return;
             }
 
-            auto &file = fileUpload.getFiles()[0];
+            auto &file = fileUpload.getFiles().front();
             auto md5 = file.getMd5();
             auto resp = HttpResponse::newHttpResponse();
             resp->setBody(
