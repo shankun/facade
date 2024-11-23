@@ -883,7 +883,7 @@ Json::Value src_ithome::ParseData(const HttpResponsePtr& pResp) const
 {
     Json::Value finalResp;
     // 返回格式为text/xml
-    if ((pResp->contentType() != CT_APPLICATION_XML) || pResp->body().empty())
+    if ((pResp->contentType() != CT_TEXT_PLAIN) || pResp->body().empty())
     {
         finalResp["code"] = static_cast<int>(k500InternalServerError);
         finalResp["message"] = "ithome 返回内容格式错误！";
@@ -1650,7 +1650,7 @@ Json::Value src_thepaper::ParseData(const HttpResponsePtr& pResp) const
 {
     Json::Value finalResp;
 
-    if ((pResp->contentType() != CT_APPLICATION_JSON) || 
+    if ((pResp->contentType() != CT_TEXT_PLAIN) || 
         !(pResp->jsonObject()))
     {
         finalResp["code"] = static_cast<int>(k500InternalServerError);
