@@ -874,8 +874,9 @@ HttpRequestPtr src_ithome::CreateRequest(const drogon::HttpClientPtr& client) co
 
 std::string src_ithome::srcURL() const
 {
-    // 下载非常慢
-    return std::string("https://www.ithome.com/rss");
+    // https://www.ithome.com/rss  下载非常慢
+    // 因此用github action 中转
+    return std::string("https://github.com/shankun/facade/raw/refs/heads/auto-work/cache/ithome-rss.xml");
 }
 
 Json::Value src_ithome::ParseData(const HttpResponsePtr& pResp) const
@@ -1646,8 +1647,9 @@ HttpRequestPtr src_thepaper::CreateRequest(const drogon::HttpClientPtr& client) 
 
 std::string src_thepaper::srcURL() const
 {
-    // 下载非常慢
-    return "https://cache.thepaper.cn/contentapi/wwwIndex/rightSidebar";
+    // https://cache.thepaper.cn/contentapi/wwwIndex/rightSidebar 下载非常慢
+    // 因此用github action 中转
+    return "https://github.com/shankun/facade/raw/refs/heads/auto-work/cache/the-paper.json";
 }
 
 Json::Value src_thepaper::ParseData(const HttpResponsePtr& pResp) const
