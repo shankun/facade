@@ -876,12 +876,11 @@ std::string src_ithome::srcURL() const
 {
     // https://www.ithome.com/rss  下载非常慢
     // 因此用github action 中转
-    return std::string("https://github.com/shankun/facade/raw/refs/heads/auto-work/cache/ithome-rss.xml");
+    return std::string("https://raw.githubusercontent.com/shankun/facade/refs/heads/auto-work/cache/ithome-rss.xml");
 }
 
 Json::Value src_ithome::ParseData(const HttpResponsePtr& pResp) const
 {
-    LOG_INFO << "src_ithome: " << pResp->contentType() << " and " << pResp->body().size();
     Json::Value finalResp;
     // 返回格式为text/xml
     if ((pResp->contentType() != CT_TEXT_XML) || pResp->body().empty())
@@ -891,12 +890,7 @@ Json::Value src_ithome::ParseData(const HttpResponsePtr& pResp) const
         return finalResp;
     }
 
-    //converter conv("UTF-8", "GB2312", true);
     const std::string xmlString{pResp->body().data()};
-    LOG_INFO << xmlString.c_str();
-    //std::string xmlString;
-    //conv.convert(input, xmlString);
-
     pugi::xml_document doc;
     pugi::xml_parse_result result = doc.load_string(xmlString.c_str());
     std::string strVal;
@@ -1649,7 +1643,7 @@ std::string src_thepaper::srcURL() const
 {
     // https://cache.thepaper.cn/contentapi/wwwIndex/rightSidebar 下载非常慢
     // 因此用github action 中转
-    return "https://github.com/shankun/facade/raw/refs/heads/auto-work/cache/the-paper.json";
+    return "https://raw.githubusercontent.com/shankun/facade/refs/heads/auto-work/cache/the-paper.json";
 }
 
 Json::Value src_thepaper::ParseData(const HttpResponsePtr& pResp) const
