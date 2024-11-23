@@ -324,7 +324,7 @@ LOG_INFO << "URL: " << req_path;
     }
     catch (const HttpException &e)
     {
-        LOG_ERROR << "Unexpected exception: " << e.what();
+        LOG_ERROR << "获取原始信息出错: " << e.what();
         respData["code"] = static_cast<int>(e.code());
         respData["message"] = e.what();
         respData["name"] = key;

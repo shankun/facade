@@ -868,92 +868,65 @@ Json::Value src_huxiu::ParseData(const HttpResponsePtr& pResp) const
 
 HttpRequestPtr src_ithome::CreateRequest(const drogon::HttpClientPtr& client) const
 {
-    client->setUserAgent("Mozilla/5.0 (iPhone; CPU iPhone OS 15_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/15.0 Mobile/15E148 Safari/604.1");
+    client->setUserAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36 Edg/131.0.0.0");
     return HttpRequest::newHttpRequest();
 }
 
 std::string src_ithome::srcURL() const
 {
-    return "https://m.ithome.com/rankm";
+    // 下载非常慢
+    return std::string("https://www.ithome.com/rss");
 }
 
 Json::Value src_ithome::ParseData(const HttpResponsePtr& pResp) const
 {
+    LOG_INFO << "src_ithome: " << pResp->contentType() << " and " << pResp->body().size();
     Json::Value finalResp;
-    // 返回格式为text/html
-    if ((pResp->contentType() != CT_TEXT_HTML) || pResp->body().empty())
+    // 返回格式为text/xml
+    if ((pResp->contentType() != CT_TEXT_XML) || pResp->body().empty())
     {
         finalResp["code"] = static_cast<int>(k500InternalServerError);
         finalResp["message"] = "ithome 返回内容格式错误！";
         return finalResp;
     }
 
+    //converter conv("UTF-8", "GB2312", true);
+    const std::string xmlString{pResp->body().data()};
+    LOG_INFO << xmlString.c_str();
+    //std::string xmlString;
+    //conv.convert(input, xmlString);
+
+    pugi::xml_document doc;
+    pugi::xml_parse_result result = doc.load_string(xmlString.c_str());
     std::string strVal;
-    std::string resp_str{pResp->body()};
-    std::replace(resp_str.begin(), resp_str.end(), '\n',' ');
-    const std::regex idPattern{R"([html|live]\/(\d+)\.htm)"};
-    try
+    std::regex href("<[^>]+>");
+
+    if (result)
     {
-        BeautifulSoup parser(resp_str);
-        auto rank_items = parser.find_all("div", {{"class", "rank-name"}});
-
-        for(const TagNode& rank_item : rank_items)
+        pugi::xpath_node_set items = doc.select_nodes("/rss/channel/item");
+        for (auto itr = items.begin(); itr != items.end(); ++itr)
         {
-            const std::string rank_type = parser.getNodeText(rank_item);
-            const Node& rank_box = rank_item.getNextSibling();
-            const auto& articles = 
-                parser.find_all(rank_box, "div", {{"class", "placeholder one-img-plc"}});
-            
-            if (articles.empty())
-                continue;
-            
-            for (const TagNode& article : articles)
-            {
-                bool found = false;
-                const TagNode& title = parser.find(article, "p", {{"class", "plc-title"}}, found);
-                if (!found)
-                    continue;
+            Json::Value eachPost;
+            eachPost["title"] = itr->node().child_value("title");
 
-                Json::Value eachPost;
-                const TagNode& link = parser.find(article, "a", found);
-                if (found)
-                {
-                    strVal = link["href"];
-                    eachPost["mobileUrl"] = strVal;
-                    std::smatch results;
-                    if (std::regex_search(strVal, results, idPattern))
-                    {
-                        strVal = results[1];
-                        eachPost["url"] = 
-                            std::format("https://www.ithome.com/0/{}/{}.htm", strVal.substr(0, 3), strVal.substr(3));
-                    }
-                }
+            strVal = itr->node().child_value("description");
+            // 删除文本中的超链接标记
+            std::string text =
+                std::regex_replace(strVal, href, std::string(" "));
 
-                eachPost["title"] = parser.getNodeText(title);
-
-                const TagNode& image = parser.find(article, "img", found);
-                if (found)
-                    eachPost["img"] = image["data-original"];
-
-                const TagNode& time = parser.find(article, "span", {{"class", "post-time"}}, found);
-                if (found)
-                    eachPost["time"] = parser.getNodeText(time);
-
-                eachPost["type"] = rank_type;
-
-                const TagNode& reviews = parser.find(article, "span", {{"class", "review-num"}}, found);
-                if (found)
-                    eachPost["hot"] = std::stoi(parser.getNodeText(reviews));
-                
-                finalResp["data"].append(eachPost);
-            }
+            eachPost["desc"] = text;
+            eachPost["time"] = itr->node().child_value("pubDate");
+            strVal = itr->node().child_value("link");
+            eachPost["url"] = strVal;
+            strVal = strVal.replace(strVal.find("www."), strVal.length(), "m.");
+            eachPost["mobileUrl"] = strVal;
+            finalResp["data"].append(eachPost);
         }
     }
-    catch(const std::exception& e)
+    else
     {
-        finalResp["code"] = static_cast<int>(k500InternalServerError);
-        finalResp["message"] = e.what();
-        return finalResp;
+        finalResp["code"] = static_cast<int>(result.status);
+        finalResp["message"] = result.description();
     }
     
     return finalResp;
@@ -1495,8 +1468,6 @@ HttpRequestPtr src_smth::CreateRequest(const drogon::HttpClientPtr& client) cons
 
 std::string src_smth::srcURL() const
 {
-    // 直接从阿里云访问报错：您的ksbj-IP因为访问过于频繁，已被系统封禁
-    // 因此使用代理转发
     return "https://www.newsmth.net/nForum/rss/topten";
 }
 
@@ -1675,6 +1646,7 @@ HttpRequestPtr src_thepaper::CreateRequest(const drogon::HttpClientPtr& client) 
 
 std::string src_thepaper::srcURL() const
 {
+    // 下载非常慢
     return "https://cache.thepaper.cn/contentapi/wwwIndex/rightSidebar";
 }
 

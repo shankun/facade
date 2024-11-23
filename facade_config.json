@@ -422,7 +422,7 @@
         //max_memory_body_size: Set the maximum body size in memory of HTTP requests received by drogon. The default value is "64K" bytes.
         //If the body size of a HTTP request exceeds this limit, the body is stored to a temporary file for processing.
         //Setting it to "" means no limit.
-        "client_max_memory_body_size": "64K",
+        "client_max_memory_body_size": "",
         //client_max_websocket_message_size: Set the maximum size of messages sent by WebSocket client. The default value is "128K".
         //One can set it to "1024", "1k", "10M", "1G", etc. Setting it to "" means no limit.
         "client_max_websocket_message_size": "128K",
