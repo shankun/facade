@@ -2,11 +2,6 @@
 set -e
 set -o pipefail
 
-# For backwards compatibility
-if [[ -n "$TOKEN" ]]; then
-    GITHUB_TOKEN=$TOKEN
-fi
-
 if [[ -z "$OUT_DIR" ]]; then
     OUT_DIR="cache"
 fi
@@ -19,11 +14,6 @@ else
         exit 1
     fi
     TARGET_REPOSITORY=${GITHUB_REPOSITORY}
-fi
-
-if [[ -z "$GITHUB_TOKEN" ]]; then
-    echo "Set the GITHUB_TOKEN or TOKEN env variables."
-    exit 1
 fi
 
 if [[ -z "$GITHUB_HOSTNAME" ]]; then
