@@ -20,7 +20,7 @@ if [[ -z "$GITHUB_HOSTNAME" ]]; then
     GITHUB_HOSTNAME="github.com"
 fi
 
-if [! -d "./cache" ]; then
+if [[ ! -d "./cache" ]]; then
     mkdir cache
 fi
 
