@@ -22,7 +22,7 @@ fi
 
 if [! -d "./cache" ]; then
     mkdir cache
-if
+fi
 
 echo "Starting deploy..."
 
