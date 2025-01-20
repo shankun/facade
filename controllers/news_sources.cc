@@ -162,8 +162,8 @@ std::string src_bestblogs::srcURL() const
 Json::Value src_bestblogs::ParseData(const HttpResponsePtr& pResp) const
 {
     Json::Value finalResp;
-    // 返回格式为text/xml
-    if ((pResp->contentType() != CT_TEXT_PLAIN) || pResp->body().empty())
+    // 返回格式为application/xml
+    if ((pResp->contentType() != CT_APPLICATION_XML) || pResp->body().empty())
     {
         finalResp["code"] = static_cast<int>(k500InternalServerError);
         finalResp["message"] = "BestBlogs 返回内容格式错误！";
