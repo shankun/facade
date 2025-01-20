@@ -10,8 +10,10 @@ using namespace dailyhot;
 Newsfeed::Newsfeed()
 : m_allNewsSrc({{"36kr", {"36氪", "热榜"}},
                 {"baidu", {"百度", "热搜榜"}},
+                {"bestblogs", {"BestBlogs", "一周精选"}},
                 {"bilibili", {"哔哩哔哩", "热门榜"}},
                 {"calendar", {"历史上的今天", "历史事件"}},
+                {"ckxx", {"参考消息", "频道"}},
                 {"douban", {"豆瓣", "新片榜"}},
                 {"douban_group", {"豆瓣小组", "精选话题"}},
                 {"douyin", {"抖音", "热点榜"}},
@@ -37,8 +39,7 @@ Newsfeed::Newsfeed()
                 {"v2ex", {"v2ex论坛", "新帖"}},
                 {"weibo", {"微博", "热搜榜"}},
                 {"weread", {"微信读书", "飙升榜"}},
-                {"zhihu", {"知乎", "热榜"}},
-                {"ckxx", {"参考消息", "频道"}}
+                {"zhihu", {"知乎", "热榜"}}
                })
 , m_ckxxChannels({"zhongguo", "gj", "guandian", "ruick", 
                   "tiyujk", "kejiyy", "wenhualy", 
@@ -51,6 +52,7 @@ Newsfeed::Newsfeed()
                   {"62", "飙升榜"}, {"26", "热歌榜"}, 
                   {"27", "新歌榜"}, {"4", "流行指数榜"}, 
                   {"52", "腾讯音乐人原创榜"}, {"67", "听歌识曲榜"}})
+, m_bestBlogsCategories({"programming", "ai"})
 {
 }
 
@@ -348,12 +350,17 @@ std::string Newsfeed::GetTypeId(const std::string& src, int type_val) const
     // type: 1=飙升榜; 2=热歌榜; 3=新歌榜; 4=流行指数榜; 
     //       5=腾讯音乐人原创榜; 6=听歌识曲榜
 
+    // BestBlogs需要传入指定榜单类别
+    // type: 1=软件编程；2=人工智能
+
     if (src == "ckxx")
         type_str = m_ckxxChannels[type_val - 1];
     else if (src == "netease_music")
         type_str = m_wyCategories[type_val - 1];
     else if (src == "qq_music")
         type_str = m_qqCategories[type_val - 1];
+    else if (src == "bestblogs")
+        type_str = m_bestBlogsCategories[type_val - 1];
     
     return type_str;
 }
