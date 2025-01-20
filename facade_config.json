@@ -29,6 +29,7 @@
     "image/ktx": "ktx",
     "image/crn": "crn",
     "text/xml": "xml",
+    "text/yaml": "yaml",
     "image/gif": "gif",
     "image/x-ms-bmp": "bmp",
     "image/png": "png",
@@ -252,7 +253,10 @@
 	"m3u",
         "webp",
         "svg",
-        "tar"
+        "tar",
+	"obj",
+	"fshader",
+	"vshader"
       ],
         //locations: An array of locations of static files for GET requests.
         "locations": [
@@ -276,7 +280,7 @@
                 //filters: string array, the filters applied to the location.
                 "filters": []
             },
-	    {
+            {
                 "uri_prefix": "/blog",
                 "default_content_type": "text/html",
                 "alias": "/srv/http/static/shankun.github.io/public",
@@ -284,8 +288,8 @@
                 "allow_all": true,
                 "is_recursive": true,
                 "filters": []
-	    },
-	    {
+            },
+            {
                 "uri_prefix": "/dailyhot",
                 "default_content_type": "text/html",
                 "alias": "/srv/http/static/dailyhot",
@@ -293,8 +297,8 @@
                 "allow_all": true,
                 "is_recursive": true,
                 "filters": []
-	    },
-	    {
+            },
+            {
                 "uri_prefix": "/rustbook",
                 "default_content_type": "text/html",
                 "alias": "/srv/http/static/rustbook",
@@ -302,7 +306,25 @@
                 "allow_all": true,
                 "is_recursive": true,
                 "filters": []
-	    }
+            },
+            {
+                "uri_prefix": "/doc-gtkmm4",
+                "default_content_type": "text/html",
+                "alias": "/srv/http/static/gtkmm4doc",
+                "is_case_sensitive": false,
+                "allow_all": true,
+                "is_recursive": true,
+                "filters": []
+            },
+            {
+                "uri_prefix": "/gtkmm",
+                "default_content_type": "text/html",
+                "alias": "/srv/http/static/gtkmm-doc-4.12.0/docs/tutorial/html",
+                "is_case_sensitive": false,
+                "allow_all": true,
+                "is_recursive": true,
+                "filters": []
+            }
         ],
         //max_connections: maximum number of connections, 100000 by default
         "max_connections": 100000,
