@@ -2024,8 +2024,11 @@ Json::Value src_zhihu::ParseData(const HttpResponsePtr& pResp) const
             item["title"] = each_question["target"]["title"];
             item["desc"] = each_question["target"]["excerpt"];
             item["hot"] = each_question["target"]["follower_count"];
-            item["url"] = each_question["target"]["url"];
-            item["mobileUrl"] = item["url"];
+            val_str = each_question["target"]["url"];
+            val_str.replace(val_str.find("//api."), 6, "//www.");
+            val_str.replace(val_str.find("/questions/"), 11, "/question/");
+            item["url"] = val_str;
+            item["mobileUrl"] = val_str;
             finalResp["data"].append(item);
         }
     }
