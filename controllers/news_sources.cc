@@ -1980,78 +1980,51 @@ Json::Value src_weread::ParseData(const HttpResponsePtr& pResp) const
 HttpRequestPtr src_zhihu::CreateRequest(const drogon::HttpClientPtr& client) const
 {
     client->setUserAgent("Mozilla/5.0 (iPhone; CPU iPhone OS 15_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/15.0 Mobile/15E148 Safari/604.1");
+    client->addCookie("d_c0", "ARBa3GISdBiPTqrgntw969IEUdvHH3N3NbI=|1712886308");
+    client->addCookie("z_c0", "2|1:0|10:1745206017|4:z_c0|80:MS4xTVV4RFdRQUFBQUFtQUFBQVlBSlZUZmFTN0dnVDBiS0wtWGxnOHZDUU1XNWZJb0R6MzU0RVNRPT0=|aec64d4e01796b224e86e0650005d284739e6f5835c5d1b4517b33651c619fd7;");
+    client->addCookie("_xsrf", "nwx7SWNO9ZcKcLsdyuvBsfdThYp0XeMt");
+    client->addCookie("_zap", "37058118-93d1-4e01-90d7-a7d876fec7c5");
+    client->addCookie("Hm_lvt_98beee57fd2ef70ccdd5ca52b9740c49", "1746511099");
+    client->addCookie("HMACCOUNT", "538ABEBF214DDB9A");
+    client->addCookie("q_c1", "16a21a4d272b4e189acf24036422030f|1746584813000|1746584813000");
+    client->addCookie("tst", "h");
+    client->addCookie("__zse_ck", "004_tdKzzLrGiKSvghIBhXKw0J/NWI0ylWyB5CZDdfckYHGM34Mj5sidIvjQeRkt9enCjlCq8gUh4eB01ZdSexk7qiBXz57YSX/uhuME6IQKCmh/dj6d1qPdaBscURkWN9tx-xhbVLQO6xnHbHxPYilesjJe4Z4vzffEuuROXSpb0V7ccczom4I1Gq4cyagQzgKX4bO0u7OVAcWZGf6xNdLoDgOp65gEnu1rxqijtPEyGyuLmWk1UpdP1/iU9UbY75KzM");
+    client->addCookie("Hm_lpvt_98beee57fd2ef70ccdd5ca52b9740c49", "1746667848");
+    client->addCookie("SESSIONID", "ixQULRO86k73iQ8uWXrv5PFcHf15k3Afhp7uekzpfBr");
+    client->addCookie("JOID", "UFoSAUgLruW_71AWXAr_vigoYaJNYtOx66ICXGE8xdeJhwAuLEan_dfuVRZYQVgI8hUmeO0_lCAsmjK1NBdJDWQ=");
+    client->addCookie("osd", "VlkcAk0Nreu86lYVUgn6uCsmYqdLYd2y7qQBUmI5w9SHhAUoL0ik-NHtWxVdR1sG8RAge-M8kSYvlDGwMhRHDmE=");
+    client->addCookie("BEC", "92a0fca0e2e4d1109c446d0a990ad863");
     return HttpRequest::newHttpRequest();
 }
 
 std::string src_zhihu::srcURL() const
 {
-    return "https://www.zhihu.com/hot";
+    return "https://www.zhihu.com/api/v4/feed/topstory/hot-lists/total?limit=20";
 }
 
 Json::Value src_zhihu::ParseData(const HttpResponsePtr& pResp) const
 {
     Json::Value finalResp;
 
-    if (pResp->contentType() != CT_TEXT_HTML)
+    if (pResp->contentType() != CT_APPLICATION_JSON)
     {
         finalResp["code"] = static_cast<int>(k500InternalServerError);
         finalResp["message"] = "知乎 返回内容格式错误！";
         return finalResp;
     }
 
-    Json::Value root;
-    const std::string htmlBody = pResp->body().data();
-    const std::string tagStart{"<script id=\"js-initialData\" type=\"text/json\">"};
-    auto bgn = htmlBody.find(tagStart);
-    if (bgn != std::string::npos)
-    {
-        bgn += tagStart.length();
-        auto end = htmlBody.find("</script>", bgn);
-        if (end != std::string::npos && end > bgn)
-        {
-            Json::CharReaderBuilder readFromstr;
-            std::stringstream ss(htmlBody.substr(bgn, end - bgn));
-            std::string parseError;
-            if (!Json::parseFromStream(readFromstr, ss, &root, &parseError))
-            {
-                finalResp["code"] = static_cast<int>(k500InternalServerError);
-                finalResp["message"] = "返回HTML中json块的格式错误！";
-                return finalResp;
-            }
-        }
-    }
-
-    if (false == root["initialState"]["topstory"]["hotList"].isArray())
-    {
-        finalResp["code"] = static_cast<int>(k500InternalServerError);
-        finalResp["message"] = "解析items的内容错误！";
-        return finalResp;
-    }
-
     std::string val_str;
-    const std::regex notNumber{R"([^\d.])"};
-    const Json::Value& contents = root["initialState"]["topstory"]["hotList"];
-    if (contents.isArray())
+    const Json::Value& root = *(pResp->jsonObject());
+    if (root["data"].isArray())
     {
-        for (auto each : contents)
+        for (auto each_question : root["data"])
         {
             Json::Value item;
-            const std::string id_str{each["id"].asString()};
-            item["title"] = each["target"]["titleArea"]["text"];
-            item["desc"] = each["target"]["excerptArea"]["text"];
-            val_str = each["target"]["imageArea"]["url"].asString();
-            val_str = dailyhot::UnEscape(val_str);
-            item["pic"] = val_str;
-
-            val_str = each["target"]["metricsArea"]["text"].asString();
-            std::string text =
-                std::regex_replace(val_str, notNumber, std::string(" "));
-
-            text.erase(std::remove(text.begin(), text.end(), ' '), text.end());
-            if (false == text.empty())
-                item["hot"] = std::stof(text) * 10000;
-                
-            item["url"] = each["target"]["link"]["url"];
+            item["id"] = each_question["target"]["id"];
+            item["title"] = each_question["target"]["title"];
+            item["desc"] = each_question["target"]["excerpt"];
+            item["hot"] = each_book["target"]["follower_count"];
+            item["url"] = each_book["target"]["url"];;
             item["mobileUrl"] = item["url"];
             finalResp["data"].append(item);
         }
