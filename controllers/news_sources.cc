@@ -2023,8 +2023,8 @@ Json::Value src_zhihu::ParseData(const HttpResponsePtr& pResp) const
             item["id"] = each_question["target"]["id"];
             item["title"] = each_question["target"]["title"];
             item["desc"] = each_question["target"]["excerpt"];
-            item["hot"] = each_book["target"]["follower_count"];
-            item["url"] = each_book["target"]["url"];;
+            item["hot"] = each_question["target"]["follower_count"];
+            item["url"] = each_question["target"]["url"];
             item["mobileUrl"] = item["url"];
             finalResp["data"].append(item);
         }
