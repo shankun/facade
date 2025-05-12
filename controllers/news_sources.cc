@@ -1962,7 +1962,6 @@ Json::Value src_weread::ParseData(const HttpResponsePtr& pResp) const
             item["title"] = each_book["bookInfo"]["title"];
             item["desc"] = each_book["bookInfo"]["intro"];
             val_str = each_book["bookInfo"]["cover"].asString();
-            val_str.replace(val_str.find("s_"), 2, "t9_");
             item["pic"] = val_str;
             item["hot"] = each_book["readingCount"];
             item["author"] = each_book["bookInfo"]["author"];
