@@ -92,6 +92,17 @@ std::string dailyhot::toLower(const std::string &in)
     return out;
 }
 
+std::string dailyhot::replaceAll(const std::string &str, const std::string &oldStr, const std::string &newStr)
+{
+    std::string finalStr(str);
+    size_t start_pos = 0;
+    while ((start_pos = finalStr.find(oldStr, start_pos)) != std::string::npos) {
+        finalStr.replace(start_pos, oldStr.length(), newStr);
+        start_pos += newStr.length();
+    }
+    return finalStr;
+}
+
 std::string dailyhot::UnEscape(const std::string &escaped_str)
 {
     std::string origin = escaped_str;
@@ -196,5 +207,21 @@ drogon::HttpClientPtr dailyhot::CreateHttpClient(std::string& path)
 
     path = req_path;
     return drogon::HttpClient::newHttpClient(server_name);
+}
+
+std::string dailyhot::GetCurProcPath()
+{
+    std::string location;
+    char exePath[PATH_MAX];
+    size_t len = readlink("/proc/self/exe", exePath, sizeof(exePath) - 1);
+    if (len != -1) {
+        exePath[len] = '\0'; // 添加字符串结束符
+        location = exePath;
+        size_t lastSlash = location.rfind('/');
+        if (lastSlash != std::string::npos)
+            location = location.substr(0, lastSlash + 1);
+    }
+
+    return location;
 }
 

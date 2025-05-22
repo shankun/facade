@@ -1979,20 +1979,31 @@ Json::Value src_weread::ParseData(const HttpResponsePtr& pResp) const
 HttpRequestPtr src_zhihu::CreateRequest(const drogon::HttpClientPtr& client) const
 {
     client->setUserAgent("Mozilla/5.0 (iPhone; CPU iPhone OS 15_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/15.0 Mobile/15E148 Safari/604.1");
-    client->addCookie("d_c0", "ARBa3GISdBiPTqrgntw969IEUdvHH3N3NbI=|1712886308");
-    client->addCookie("z_c0", "2|1:0|10:1745206017|4:z_c0|80:MS4xTVV4RFdRQUFBQUFtQUFBQVlBSlZUZmFTN0dnVDBiS0wtWGxnOHZDUU1XNWZJb0R6MzU0RVNRPT0=|aec64d4e01796b224e86e0650005d284739e6f5835c5d1b4517b33651c619fd7;");
-    client->addCookie("_xsrf", "nwx7SWNO9ZcKcLsdyuvBsfdThYp0XeMt");
-    client->addCookie("_zap", "37058118-93d1-4e01-90d7-a7d876fec7c5");
-    client->addCookie("Hm_lvt_98beee57fd2ef70ccdd5ca52b9740c49", "1746511099");
-    client->addCookie("HMACCOUNT", "538ABEBF214DDB9A");
-    client->addCookie("q_c1", "16a21a4d272b4e189acf24036422030f|1746584813000|1746584813000");
-    client->addCookie("tst", "h");
-    client->addCookie("__zse_ck", "004_tdKzzLrGiKSvghIBhXKw0J/NWI0ylWyB5CZDdfckYHGM34Mj5sidIvjQeRkt9enCjlCq8gUh4eB01ZdSexk7qiBXz57YSX/uhuME6IQKCmh/dj6d1qPdaBscURkWN9tx-xhbVLQO6xnHbHxPYilesjJe4Z4vzffEuuROXSpb0V7ccczom4I1Gq4cyagQzgKX4bO0u7OVAcWZGf6xNdLoDgOp65gEnu1rxqijtPEyGyuLmWk1UpdP1/iU9UbY75KzM");
-    client->addCookie("Hm_lpvt_98beee57fd2ef70ccdd5ca52b9740c49", "1746667848");
-    client->addCookie("SESSIONID", "ixQULRO86k73iQ8uWXrv5PFcHf15k3Afhp7uekzpfBr");
-    client->addCookie("JOID", "UFoSAUgLruW_71AWXAr_vigoYaJNYtOx66ICXGE8xdeJhwAuLEan_dfuVRZYQVgI8hUmeO0_lCAsmjK1NBdJDWQ=");
-    client->addCookie("osd", "VlkcAk0Nreu86lYVUgn6uCsmYqdLYd2y7qQBUmI5w9SHhAUoL0ik-NHtWxVdR1sG8RAge-M8kSYvlDGwMhRHDmE=");
-    client->addCookie("BEC", "92a0fca0e2e4d1109c446d0a990ad863");
+    // 读取可执行文件所在目录下的zhihu_cookie.txt
+    std::ifstream fCookie(dailyhot::GetCurProcPath() + "zhihu_cookie.txt");
+    if (fCookie.is_open())
+    {
+        std::string eachLine;
+        while (std::getline(fCookie, eachLine))
+        {
+            eachLine = dailyhot::replaceAll(eachLine, "\r\n", "");
+            std::istringstream iss(eachLine);
+            std::string token;
+            while (std::getline(iss, token, ';'))
+            {
+                token.erase(0, token.find_first_not_of(' ')); // trim
+                token.erase(token.find_last_not_of(' ') + 1);
+                size_t sep = token.find('=');
+                if (sep != std::string::npos)
+                    client->addCookie(token.substr(0, sep), token.substr(sep + 1));
+            }
+        }
+    }
+    else
+    {
+        LOG_ERROR << "Read zhihu_cookie.txt failed!";
+    }
+
     return HttpRequest::newHttpRequest();
 }
 

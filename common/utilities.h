@@ -34,6 +34,8 @@ drogon::HttpClientPtr CreateHttpClient(std::string& path);
 
 std::string toLower(const std::string &in);
 
+std::string replaceAll(const std::string &str, const std::string &oldStr, const std::string &newStr);
+
 // 将Unicode编码（形如：\\u5b55）转为字符串，假设都是ansi字符，不考虑宽字符编码转换
 std::string UnEscape(const std::string& escaped_str);
 
@@ -42,4 +44,6 @@ std::string UnEscape(const std::string& escaped_str);
 //  @returns {string} - 唯一的书籍 ID
 std::string GetWeReadID(const std::string& bookId);
 
+// 获取当前可执行文件所在目录，以'/'结尾
+std::string GetCurProcPath();
 }
