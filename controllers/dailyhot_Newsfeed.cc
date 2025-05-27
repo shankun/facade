@@ -29,6 +29,7 @@ Newsfeed::Newsfeed()
                 {"netease_music", {"网易云音乐", "排行榜"}},
                 {"newsqq", {"腾讯新闻", "热点榜"}},
                 {"qq_music", {"QQ音乐", "排行榜"}},
+                {"rustcc", {"Rust中文社区", "最新贴子"}},
                 {"sina", {"新浪新闻", "最新新闻"}},
                 {"smth", {"水木社区", "十大话题"}},
                 {"solidot", {"Solidot", "最新资讯"}},

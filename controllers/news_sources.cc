@@ -1431,6 +1431,73 @@ Json::Value src_qq_music::ParseData(const HttpResponsePtr& pResp) const
     return finalResp;
 }
 
+HttpRequestPtr src_rustcc::CreateRequest(const drogon::HttpClientPtr& client) const
+{
+    return HttpRequest::newHttpRequest();
+}
+
+std::string src_rustcc::srcURL() const
+{
+    return "https://rustcc.cn/rss";
+}
+
+Json::Value src_rustcc::ParseData(const HttpResponsePtr& pResp) const
+{
+    Json::Value finalResp;
+    // 返回格式为text/xml
+    if ((pResp->contentType() != CT_TEXT_XML) || pResp->body().empty())
+    {
+        finalResp["code"] = static_cast<int>(k500InternalServerError);
+        finalResp["message"] = "rustcc 返回内容格式错误！";
+        return finalResp;
+    }
+
+    pugi::xml_document doc;
+    pugi::xml_parse_result result = doc.load_string(pResp->body().data());
+    std::string strVal;
+    std::regex href("<[^>]+>");
+
+    if (result)
+    {
+        const std::string newLine = "\n";
+        pugi::xpath_node_set items = doc.select_nodes("/rss/channel/item");
+        for (pugi::xpath_node_set::const_iterator itr = items.begin(); 
+            itr != items.end(); ++itr)
+        {
+            Json::Value eachPost;
+            eachPost["title"] = itr->node().child_value("title");
+
+            strVal = itr->node().child_value("description");
+            // 删除文本中的超链接标记
+            std::string text =
+                std::regex_replace(strVal, href, std::string(" "));
+
+            size_t pos = text.find(newLine);
+            while (pos != text.npos)
+            {
+                text.replace(pos, newLine.length(), "");
+                pos = text.find(newLine);
+            }
+            
+            text.erase(0, text.find_first_not_of(' ')); // trim
+            text.erase(text.find_last_not_of(' ') + 1);
+            eachPost["desc"] = text;
+            eachPost["time"] = itr->node().child_value("pubDate");
+            strVal = itr->node().child_value("link");
+            eachPost["url"] = strVal;
+            eachPost["mobileUrl"] = eachPost["url"];
+            finalResp["data"].append(eachPost);
+        }
+    }
+    else
+    {
+        finalResp["code"] = static_cast<int>(result.status);
+        finalResp["message"] = result.description();
+    }
+
+    return finalResp;
+}
+
 HttpRequestPtr src_sina::CreateRequest(const drogon::HttpClientPtr& client) const
 {
     client->setUserAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36 Edg/114.0.1823.67");
