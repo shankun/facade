@@ -193,7 +193,7 @@ Json::Value src_bestblogs::ParseData(const HttpResponsePtr& pResp) const
             eachPost["time"] = itr->node().child_value("pubDate");
             strVal = itr->node().child_value("link");
             eachPost["url"] = strVal;
-            strVal = strVal.replace(strVal.find("www."), strVal.length(), "m.");
+            strVal = strVal.replace(strVal.find("www."), 4, "m.");
             eachPost["mobileUrl"] = strVal;
             finalResp["data"].append(eachPost);
         }
@@ -894,7 +894,7 @@ Json::Value src_huxiu::ParseData(const HttpResponsePtr& pResp) const
             eachPost["time"] = itr->node().child_value("pubDate");
             strVal = itr->node().child_value("link");
             eachPost["url"] = strVal;
-            strVal = strVal.replace(strVal.find("www."), strVal.length(), "m.");
+            strVal = strVal.replace(strVal.find("www."), 4, "m.");
             eachPost["mobileUrl"] = strVal;
             finalResp["data"].append(eachPost);
         }
@@ -955,7 +955,7 @@ Json::Value src_ithome::ParseData(const HttpResponsePtr& pResp) const
             eachPost["time"] = itr->node().child_value("pubDate");
             strVal = itr->node().child_value("link");
             eachPost["url"] = strVal;
-            strVal = strVal.replace(strVal.find("www."), strVal.length(), "m.");
+            strVal = strVal.replace(strVal.find("www."), 4, "m.");
             eachPost["mobileUrl"] = strVal;
             finalResp["data"].append(eachPost);
         }
