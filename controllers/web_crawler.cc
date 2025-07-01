@@ -153,3 +153,17 @@ void WebCrawler::UpdateCache()
     }
 }
 
+std::string WebCrawler::ExtractContent(const std::string& decoratedStr, 
+        const std::string& pre, const std::string& suf) const
+{
+    std::string result = decoratedStr;
+    if (!pre.empty() && decoratedStr.find(pre) == 0)
+        result = decoratedStr.substr(pre.length());
+    
+    std::string::size_type end = result.rfind(suf);
+    if (!suf.empty() && end != std::string::npos)
+        result = result.substr(0, end);
+
+    return result;
+}
+

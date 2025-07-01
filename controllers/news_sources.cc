@@ -854,73 +854,55 @@ HttpRequestPtr src_huxiu::CreateRequest(const drogon::HttpClientPtr& client) con
 
 std::string src_huxiu::srcURL() const
 {
-    return "https://www.huxiu.com/article/";
+    return "https://rss.huxiu.com/";
 }
 
 Json::Value src_huxiu::ParseData(const HttpResponsePtr& pResp) const
 {
     Json::Value finalResp;
-    // 返回格式为text/html
-    if ((pResp->contentType() != CT_TEXT_HTML) || pResp->body().empty())
+    // 返回格式为text/xml
+    if ((pResp->contentType() != CT_APPLICATION_XML) || pResp->body().empty())
     {
         finalResp["code"] = static_cast<int>(k500InternalServerError);
         finalResp["message"] = "虎嗅 返回内容格式错误！";
         return finalResp;
     }
 
-    Json::Value root;
-    const std::string htmlBody = pResp->body().data();
-    const std::string dataStart{"window.__INITIAL_STATE__={"};
-    auto bgn = htmlBody.find(dataStart);
-    if (bgn != std::string::npos)
+    pugi::xml_document doc;
+    pugi::xml_parse_result result = doc.load_string(pResp->body().data());
+    std::string strVal;
+    std::regex href("<[^>]+>");
+    const std::string prefix{"<![CDATA[ "};
+    const std::string suffix{" ]]>"};
+
+    if (result)
     {
-        bgn += dataStart.length() - 1;
-        auto end = htmlBody.find(";(function(){var s;", bgn);
-        if (end != std::string::npos && end > bgn)
+        const std::string newLine = "\n";
+        pugi::xpath_node_set items = doc.select_nodes("/rss/channel/item");
+        for (pugi::xpath_node_set::const_iterator itr = items.begin(); 
+            itr != items.end(); ++itr)
         {
-            Json::CharReaderBuilder readFromstr;
-            std::stringstream ss(htmlBody.substr(bgn, end - bgn));
-            std::string parseError;
-            if (!Json::parseFromStream(readFromstr, ss, &root, &parseError))
-            {
-                finalResp["code"] = static_cast<int>(k500InternalServerError);
-                finalResp["message"] = "返回HTML中json块的格式错误！";
-                return finalResp;
-            }
+            Json::Value eachPost;
+            const std::string content = itr->node().child_value("title");
+            eachPost["title"] = ExtractContent(content, prefix, suffix);
+
+            std::string text = itr->node().child_value("summary");
+            text = ExtractContent(text, prefix, suffix);
+            text.erase(0, text.find_first_not_of(' ')); // trim
+            text.erase(text.find_last_not_of(' ') + 1);
+            eachPost["desc"] = text;
+            eachPost["time"] = itr->node().child_value("pubDate");
+            strVal = itr->node().child_value("link");
+            eachPost["url"] = strVal;
+            strVal = strVal.replace(strVal.find("www."), strVal.length(), "m.");
+            eachPost["mobileUrl"] = strVal;
+            finalResp["data"].append(eachPost);
         }
     }
-    
-    Json::Value articles = root["channel"]["channels"]["datalist"];
-    if (false == articles.isArray())
+    else
     {
-        finalResp["code"] = static_cast<int>(k500InternalServerError);
-        finalResp["message"] = "解析list的内容错误！";
-        return finalResp;
-    }
-
-    std::string mAddress{"www.huxiu.com"};
-    std::string val_str;
-    for (auto each : articles)
-    {
-        Json::Value item;
-        const std::string id_str{each["aid"].asString()};
-        item["id"] = id_str;
-        val_str = each["title"].asString();
-        std::string from = each["user_info"]["username"].asString();
-        if (!from.empty())
-            val_str += " - " + from;
-
-        item["title"] = val_str;
-        item["pic"] = each["pic_path"].asString();
-        item["hot"] = each["count_info"]["favtimes"].asInt();
-        int64_t elapsed = std::strtol(each["dateline"].asCString(), nullptr, 10);
-        trantor::Date publishTime(elapsed);
-        item["time"] = publishTime.toDbStringLocal();
-        val_str = each["url"].asString();
-        item["url"] = val_str;
-        val_str.replace(val_str.find(mAddress), mAddress.length(), "m.huxiu.com");
-        item["mobileUrl"] = val_str;
-        finalResp["data"].append(item);
+        finalResp["code"] = static_cast<int>(result.status);
+        finalResp["message"] = result.description();
     }
 
     return finalResp;

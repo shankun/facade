@@ -255,6 +255,10 @@ class WebCrawler : public virtual dailyhot::FeedObjBase
     
     void UpdateCache();
 
+    // Extract the content between pre and suf from decoratedStr
+    std::string ExtractContent(const std::string& decoratedStr, 
+        const std::string& pre, const std::string& suf) const;
+
     virtual drogon::HttpRequestPtr CreateRequest(const drogon::HttpClientPtr& client) const = 0;
 
 	virtual std::string srcURL() const = 0;
