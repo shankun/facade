@@ -49,6 +49,7 @@ main() {
 
     wget -O cache/ithome-rss.xml "https://www.ithome.com/rss"
     wget -O cache/the-paper.json "https://cache.thepaper.cn/contentapi/wwwIndex/rightSidebar"
+    wget -O cache/huxiu-rss.xml "https://rss.huxiu.com"
 
     echo "Pushing artifacts to ${TARGET_REPOSITORY}:$remote_branch"
     git init

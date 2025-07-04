@@ -854,7 +854,9 @@ HttpRequestPtr src_huxiu::CreateRequest(const drogon::HttpClientPtr& client) con
 
 std::string src_huxiu::srcURL() const
 {
-    return "https://rss.huxiu.com/";
+    // https://rss.huxiu.com/  下载非常慢
+    // 因此用github action 中转
+    return std::string("https://raw.githubusercontent.com/shankun/facade/refs/heads/auto-work/cache/huxiu-rss.xml");
 }
 
 Json::Value src_huxiu::ParseData(const HttpResponsePtr& pResp) const
@@ -885,7 +887,6 @@ Json::Value src_huxiu::ParseData(const HttpResponsePtr& pResp) const
             Json::Value eachPost;
             const std::string content = itr->node().child_value("title");
             eachPost["title"] = ExtractContent(content, prefix, suffix);
-
             std::string text = itr->node().child_value("summary");
             text = ExtractContent(text, prefix, suffix);
             text.erase(0, text.find_first_not_of(' ')); // trim
@@ -1056,6 +1057,8 @@ Json::Value src_juejin::ParseData(const HttpResponsePtr& pResp) const
 
 HttpRequestPtr src_kuaishou::CreateRequest(const drogon::HttpClientPtr& client) const
 {
+    // client->setUserAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36 Edg/114.0.1823.67");
+    // return HttpRequest::newHttpRequest();
     client->setUserAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36 Edg/114.0.1823.67");
     HttpRequestPtr pCaller = HttpRequest::newHttpRequest();
     pCaller->setParameter("isHome" , "1");
@@ -1064,6 +1067,7 @@ HttpRequestPtr src_kuaishou::CreateRequest(const drogon::HttpClientPtr& client) 
 
 std::string src_kuaishou::srcURL() const
 {
+    // return "https://www.kuaishou.com/brilliant";
     return "https://www.kuaishou.com";
 }
 
