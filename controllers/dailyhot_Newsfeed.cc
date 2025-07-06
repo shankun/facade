@@ -18,6 +18,7 @@ Newsfeed::Newsfeed()
                 {"douban_group", {"豆瓣小组", "精选话题"}},
                 {"douyin", {"抖音", "热点榜"}},
                 {"douyin_music", {"抖音", "热歌榜"}},
+                {"gcores", {"机核", "资讯"}},
                 {"github", {"Github", "Trending"}},
                 {"hupu", {"虎扑步行街", "24小时榜"}},
                 {"huxiu", {"虎嗅", "最新资讯"}},

@@ -563,3 +563,4 @@ FodyWeavers.xsd
 cert/
 build/
 thirdParty/Beautiful-Soup-CPP/build/
+*.kdev4
