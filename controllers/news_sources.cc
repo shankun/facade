@@ -1159,7 +1159,7 @@ Json::Value src_kuaishou::ParseData(const HttpResponsePtr& pResp) const
         }
     }
 
-    const std::string rank{"$ROOT_QUERY.visionHotRank({\"page\":\"home\"})"};
+    const std::string rank{"$ROOT_QUERY.visionHotRank({\"page\":\"brilliant\"})"};
     if (false == root["defaultClient"][rank]["items"].isArray())
     {
         finalResp["code"] = static_cast<int>(k500InternalServerError);
