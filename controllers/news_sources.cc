@@ -232,6 +232,7 @@ Json::Value src_bilibili::ParseData(const HttpResponsePtr& pResp) const
     const Json::Value& root = *(pResp->jsonObject());
     if (root["data"]["list"].isArray())
     {
+        const std::string prefix = "http:";
         for (auto video : root["data"]["list"])
         {
             Json::Value item;
@@ -239,7 +240,6 @@ Json::Value src_bilibili::ParseData(const HttpResponsePtr& pResp) const
             item["title"] = video["title"];
             item["desc"] = video["desc"];
             std::string picUrl = video["pic"].asString();
-            std::string prefix = "http:";
             item["pic"] = picUrl.replace(picUrl.find(prefix), prefix.length(), "https:");
             item["owner"] = video["owner"];
             item["data"] = video["stat"];
@@ -916,7 +916,7 @@ std::string src_huxiu::srcURL() const
 {
     // https://rss.huxiu.com/  下载非常慢
     // 因此用github action 中转
-    return std::string("https://raw.githubusercontent.com/shankun/facade/refs/heads/auto-work/cache/huxiu-rss.xml");
+    return "https://raw.githubusercontent.com/shankun/facade/refs/heads/auto-work/cache/huxiu-rss.xml";
 }
 
 Json::Value src_huxiu::ParseData(const HttpResponsePtr& pResp) const
@@ -979,7 +979,7 @@ std::string src_ithome::srcURL() const
 {
     // https://www.ithome.com/rss  下载非常慢
     // 因此用github action 中转
-    return std::string("https://raw.githubusercontent.com/shankun/facade/refs/heads/auto-work/cache/ithome-rss.xml");
+    return "https://raw.githubusercontent.com/shankun/facade/refs/heads/auto-work/cache/ithome-rss.xml";
 }
 
 Json::Value src_ithome::ParseData(const HttpResponsePtr& pResp) const
@@ -1118,14 +1118,12 @@ Json::Value src_juejin::ParseData(const HttpResponsePtr& pResp) const
 HttpRequestPtr src_kuaishou::CreateRequest(const drogon::HttpClientPtr& client) const
 {
     client->setUserAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36 Edg/114.0.1823.67");
-    HttpRequestPtr pCaller = HttpRequest::newHttpRequest();
-    pCaller->setParameter("isHome" , "1");
-    return pCaller;
+    return HttpRequest::newHttpRequest();
 }
 
 std::string src_kuaishou::srcURL() const
 {
-    return "https://raw.githubusercontent.com/shankun/facade/refs/heads/auto-work/cache/kuaishou.xml";
+    return "https://raw.githubusercontent.com/shankun/facade/refs/heads/auto-work/cache/kuaishou.html";
 }
 
 Json::Value src_kuaishou::ParseData(const HttpResponsePtr& pResp) const
@@ -2137,6 +2135,7 @@ Json::Value src_zhihu::ParseData(const HttpResponsePtr& pResp) const
     const Json::Value& root = *(pResp->jsonObject());
     if (root["data"].isArray())
     {
+        const std::string questr{"/questions/"};
         for (auto each_question : root["data"])
         {
             Json::Value item;
@@ -2146,7 +2145,7 @@ Json::Value src_zhihu::ParseData(const HttpResponsePtr& pResp) const
             item["hot"] = each_question["target"]["follower_count"];
             val_str = each_question["target"]["url"].asString();
             val_str.replace(val_str.find("//api."), 6, "//www.");
-            val_str.replace(val_str.find("/questions/"), 11, "/question/");
+            val_str.replace(val_str.find(questr), questr.length(), "/question/");
             item["url"] = val_str;
             item["mobileUrl"] = val_str;
             finalResp["data"].append(item);
