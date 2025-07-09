@@ -47,10 +47,11 @@ main() {
     remote_repo="https://${GITHUB_ACTOR}:${GITHUB_TOKEN}@${GITHUB_HOSTNAME}/${TARGET_REPOSITORY}.git"
     remote_branch=$PAGES_BRANCH
 
-    wget -O cache/ithome-rss.xml "https://www.ithome.com/rss"
-    wget -O cache/the-paper.json "https://cache.thepaper.cn/contentapi/wwwIndex/rightSidebar"
-    wget -O cache/huxiu-rss.xml "https://rss.huxiu.com"
-    wget -O cache/kuaishou.html "https://www.kuaishou.com/brilliant"
+    wget -O cache/ithome-rss.xml "https://www.ithome.com/rss" &
+    wget -O cache/the-paper.json "https://cache.thepaper.cn/contentapi/wwwIndex/rightSidebar" &
+    wget -O cache/huxiu-rss.xml "https://rss.huxiu.com" &
+    wget -O cache/kuaishou.html "https://www.kuaishou.com/brilliant" --no-check-certificate &
+    wait
 
     echo "Pushing artifacts to ${TARGET_REPOSITORY}:$remote_branch"
     git init
