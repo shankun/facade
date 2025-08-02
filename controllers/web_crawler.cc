@@ -114,6 +114,8 @@ std::unordered_map<std::string, std::pair<FeedAllocFunc, FeedSharedAllocFunc>>
     return map;
 }
 
+std::map<std::string, Json::Value> WebCrawler::s_allNewsSrc;
+
 void WebCrawler::Save(const std::string& key_str, Json::Value jsonData)
 {
     std::lock_guard<std::mutex> lock(m_newData.mtx);
@@ -151,6 +153,22 @@ void WebCrawler::UpdateCache()
         LOG_ERROR << "Redis failed to set " 
             << m_newData.key << " : " << err.what();
     }
+}
+
+std::string WebCrawler::srcURL() const
+{
+    std::string key = className();
+    if (key.find("src_") == 0)
+        key = key.substr(4); // remove "src_" prefix
+
+    std::string url;
+    if (s_allNewsSrc.find(key) != s_allNewsSrc.end() &&
+        s_allNewsSrc.at(key).isMember("src_url"))
+    {
+        url = s_allNewsSrc.at(key)["src_url"].asString();
+    }
+ 
+    return url;
 }
 
 std::string WebCrawler::ExtractContent(const std::string& decoratedStr, 

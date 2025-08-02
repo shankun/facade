@@ -270,7 +270,7 @@
                 //presents an absolute path, otherwise it presents a relative path to 
                 //the document_root path. 
                 //The default value is "" which means use the document root path as the location base path.
-                "alias": "/srv/http/static/microblogs/public",
+                "alias": "/srv/http/static/microblogs",
                 //is_case_sensitive: indicates whether the URI prefix is case sensitive.
                 "is_case_sensitive": false,
                 //allow_all: true by default. If it is set to false, only static files with a valid extension can be accessed.
@@ -522,6 +522,220 @@
             {
                 "user": "drogon",
                 "password": "dr0g0n"
+            }
+        ],
+        "feed_src": [
+            {
+                "class": "36kr",
+                "name": "36氪",
+                "title": "热榜",
+                "src_url": "https://gateway.36kr.com/api/mis/nav/home/nav/rank/hot"
+            },
+            {
+                "class": "baidu",
+                "name": "百度",
+                "title": "热搜榜",
+                "src_url": "https://top.baidu.com/board?tab=realtime"
+            },
+            {
+                "class": "bestblogs",
+                "name": "BestBlogs",
+                "title": "一周精选",
+                "src_url": "https://www.bestblogs.dev/feeds/rss?category={parameter}&featured=y&timeFilter=1w",
+                "categories": ["programming", "ai"]
+            },
+            {
+                "class": "bilibili",
+                "name": "哔哩哔哩",
+                "title": "热门榜",
+                "src_url": "https://api.bilibili.com/x/web-interface/ranking/v2"
+            },
+            {
+                "class": "calendar",
+                "name": "历史上的今天",
+                "title": "历史事件",
+                "src_url": "https://baike.baidu.com/cms/home/eventsOnHistory/{parameter}.json"
+            },
+            {
+                "class": "ckxx",
+                "name": "参考消息",
+                "title": "频道",
+                "src_url": "https://china.cankaoxiaoxi.com/json/channel/{parameter}/list.json",
+                "categories": ["zhongguo", "gj", "guandian", "ruick", "tiyujk", "kejiyy", "wenhualy", 
+                  "cankaomt", "cankaozk", "junshi"]
+            },
+            {
+                "class": "douban",
+                "name": "豆瓣",
+                "title": "新片榜",
+                "src_url": "https://movie.douban.com/chart"
+            },
+            {
+                "class": "douban_group",
+                "name": "豆瓣小组",
+                "title": "精选话题",
+                "src_url": "https://www.douban.com/group/explore"
+            },
+            {
+                "class": "douyin",
+                "name": "抖音",
+                "title": "热点榜",
+                "src_url": "https://aweme.snssdk.com/aweme/v1/hot/search/list/?device_platform=android&version_name=13.2.0&version_code=130200&aid=1128"
+            },
+            {
+                "class": "douyin_music",
+                "name": "抖音",
+                "title": "热歌榜",
+                "src_url": "https://aweme.snssdk.com/aweme/v1/chart/music/list/?device_platform=android&version_name=13.2.0&version_code=130200&aid=1128&chart_id=6853972723954146568&count=100"
+            },
+            {
+                "class": "gcores",
+                "name": "机核",
+                "title": "资讯",
+                "src_url": "https://www.gcores.com/rss"
+            },
+            {
+                "class": "github",
+                "name": "Github",
+                "title": "Trending",
+                "src_url": "https://github.com/trending"
+            },
+            {
+                "class": "hupu",
+                "name": "虎扑步行街",
+                "title": "24小时榜",
+                "src_url": "https://bbs.hupu.com/topic-daily-hot"
+            },
+            {
+                "class": "huxiu",
+                "name": "虎嗅",
+                "title": "最新资讯",
+                "src_url": "http://hc.hongye.com.cn:8083/hcitydata/dbs/huxiu-rss.xml"
+            },
+            {
+                "class": "ithome",
+                "name": "IT之家",
+                "title": "热榜",
+                "src_url": "http://hc.hongye.com.cn:8083/hcitydata/dbs/ithome-rss.xml"
+            },
+            {
+                "class": "jianshu",
+                "name": "简书",
+                "title": "后端开发技术",
+                "src_url": "https://www.jianshu.com/programmers?page=1&type_id=27&count=20"
+            },
+            {
+                "class": "juejin",
+                "name": "稀土掘金",
+                "title": "热榜",
+                "src_url": "https://api.juejin.cn/content_api/v1/content/article_rank?category_id=1&type=hot"
+            },
+            {
+                "class": "kuaishou",
+                "name": "快手",
+                "title": "热榜",
+                "src_url": "http://hc.hongye.com.cn:8083/hcitydata/dbs/kuaishou.html"
+            },
+            {
+                "class": "netease",
+                "name": "网易新闻",
+                "title": "热点榜",
+                "src_url": "https://m.163.com/fe/api/hot/news/flow"
+            },
+            {
+                "class": "netease_music",
+                "name": "网易云音乐",
+                "title": "排行榜",
+                "src_url": "https://music.163.com/discover/toplist?id={parameter}",
+                "categories": [ { "19723756": "飙升榜" }, 
+                    { "3779629": "新歌榜" }, { "2884035": "原创榜" }, 
+                    { "3778678": "热歌榜" }]
+            },
+            {
+                "class": "newsqq",
+                "name": "腾讯新闻",
+                "title": "热点榜",
+                "src_url": "https://r.inews.qq.com/gw/event/hot_ranking_list?page_size=50"
+            },
+            {
+                "class": "qq_music",
+                "name": "QQ音乐",
+                "title": "排行榜",
+                "src_url": "https://c.y.qq.com/v8/fcg-bin/fcg_v8_toplist_cp.fcg?topid={parameter}&platform=yqq.json&jsonpCallback=MusicJsonCallbacktoplist",
+                "categories": [ {"62":"飙升榜"}, {"26":"热歌榜"}, {"27":"新歌榜"},
+                    {"4":"流行指数榜"}, {"52":"腾讯音乐人原创榜"}, {"67":"听歌识曲榜"}]
+            },
+            {
+                "class": "rustcc",
+                "name": "Rust中文社区",
+                "title": "最新贴子",
+                "src_url": "https://rustcc.cn/rss"
+            },
+            {
+                "class": "sina",
+                "name": "新浪新闻",
+                "title": "最新新闻",
+                "src_url": "https://top.news.sina.com.cn/ws/GetTopDataList.php?top_type=day&top_cat={parameter}&top_time=today&top_show_num=20&top_order=DESC&short_title=1&js_var=hotNewsData"
+            },
+            {
+                "class": "smth",
+                "name": "水木社区",
+                "title": "十大话题",
+                "src_url": "https://www.newsmth.net/nForum/rss/topten"
+            },
+            {
+                "class": "solidot",
+                "name": "Solidot",
+                "title": "最新资讯",
+                "src_url": "https://www.solidot.org/index.rss"
+            },
+            {
+                "class": "sspai",
+                "name": "少数派",
+                "title": "热榜",
+                "src_url": "https://sspai.com/api/v1/article/tag/page/get?limit=40&tag=热门文章"
+            },
+            {
+                "class": "thepaper",
+                "name": "澎湃新闻",
+                "title": "热榜",
+                "src_url": "http://hc.hongye.com.cn:8083/hcitydata/dbs/the-paper.json"
+            },
+            {
+                "class": "tieba",
+                "name": "百度贴吧",
+                "title": "热议榜",
+                "src_url": "https://tieba.baidu.com/hottopic/browse/topicList"
+            },
+            {
+                "class": "toutiao",
+                "name": "今日头条",
+                "title": "热榜",
+                "src_url": "https://www.toutiao.com/hot-event/hot-board/?origin=toutiao_pc"
+            },
+            {
+                "class": "v2ex",
+                "name": "v2ex论坛",
+                "title": "新帖",
+                "src_url": "https://v2ex.com"
+            },
+            {
+                "class": "weibo",
+                "name": "微博",
+                "title": "热搜榜",
+                "src_url": "https://weibo.com/ajax/side/hotSearch"
+            },
+            {
+                "class": "weread",
+                "name": "微信读书",
+                "title": "飙升榜",
+                "src_url": "https://weread.qq.com/web/bookListInCategory/rising?rank=1"
+            },
+            {
+                "class": "zhihu",
+                "name": "知乎",
+                "title": "热榜",
+                "src_url": "https://www.zhihu.com/api/v4/feed/topstory/hot-lists/total?limit=20"
             }
         ]
     }

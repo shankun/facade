@@ -260,10 +260,10 @@ class WebCrawler : public virtual dailyhot::FeedObjBase
         const std::string& pre, const std::string& suf) const;
 
     virtual drogon::HttpRequestPtr CreateRequest(const drogon::HttpClientPtr& client) const = 0;
-
-	virtual std::string srcURL() const = 0;
 	
 	virtual Json::Value ParseData(const drogon::HttpResponsePtr& pResp) const = 0;
+
+	virtual std::string srcURL() const;
 
     virtual ~WebCrawler()
     {
@@ -277,7 +277,11 @@ class WebCrawler : public virtual dailyhot::FeedObjBase
 
     static std::string s_dbName;
     std::string m_parameter;
-    
+    // 所有新闻来源
+    static std::map<std::string, Json::Value> s_allNewsSrc;
+
+protected:
+    const std::string m_paraMark = "{parameter}";
 private:
     NewsItem m_newData;
 };

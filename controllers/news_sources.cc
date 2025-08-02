@@ -20,11 +20,6 @@ HttpRequestPtr src_36kr::CreateRequest(const drogon::HttpClientPtr& client) cons
     return pReq;
 }
 
-std::string src_36kr::srcURL() const
-{
-    return "https://gateway.36kr.com/api/mis/nav/home/nav/rank/hot";
-}
-
 Json::Value src_36kr::ParseData(const HttpResponsePtr& pResp) const
 {
     Json::Value finalResp;
@@ -60,11 +55,6 @@ Json::Value src_36kr::ParseData(const HttpResponsePtr& pResp) const
 HttpRequestPtr src_baidu::CreateRequest(const drogon::HttpClientPtr& client) const
 {
     return HttpRequest::newHttpRequest();
-}
-
-std::string src_baidu::srcURL() const
-{
-    return "https://top.baidu.com/board?tab=realtime";
 }
 
 Json::Value src_baidu::ParseData(const HttpResponsePtr& pResp) const
@@ -154,9 +144,19 @@ HttpRequestPtr src_bestblogs::CreateRequest(const drogon::HttpClientPtr& client)
 
 std::string src_bestblogs::srcURL() const
 {
-    std::string url{"https://www.bestblogs.dev/feeds/rss?category="};
-    url += m_parameter;
-    return url + "&featured=y&timeFilter=1w";
+    std::string key = className();
+    if (key.find("src_") == 0)
+        key = key.substr(4);
+
+    std::string url;
+    if (WebCrawler::s_allNewsSrc.find(key) != WebCrawler::s_allNewsSrc.end() &&
+        WebCrawler::s_allNewsSrc.at(key).isMember("src_url"))
+    {
+        url = WebCrawler::s_allNewsSrc.at(key)["src_url"].asString();
+        url.replace(url.find(m_paraMark), m_paraMark.length(), m_parameter);
+    }
+
+    return url;
 }
 
 Json::Value src_bestblogs::ParseData(const HttpResponsePtr& pResp) const
@@ -212,11 +212,6 @@ HttpRequestPtr src_bilibili::CreateRequest(const drogon::HttpClientPtr& client) 
     return HttpRequest::newHttpRequest();
 }
 
-std::string src_bilibili::srcURL() const
-{
-    return "https://api.bilibili.com/x/web-interface/ranking/v2";
-}
-
 Json::Value src_bilibili::ParseData(const HttpResponsePtr& pResp) const
 {
     Json::Value finalResp;
@@ -261,8 +256,18 @@ HttpRequestPtr src_calendar::CreateRequest(const drogon::HttpClientPtr& client) 
 std::string src_calendar::srcURL() const
 {
     const std::string month = trantor::Date::now().toCustomFormattedStringLocal("%m");
-    std::string url = "https://baike.baidu.com/cms/home/eventsOnHistory/" + month;
-    url += ".json";
+    std::string key = className();
+    if (key.find("src_") == 0)
+        key = key.substr(4);
+
+    std::string url;
+    if (WebCrawler::s_allNewsSrc.find(key) != WebCrawler::s_allNewsSrc.end() &&
+        WebCrawler::s_allNewsSrc.at(key).isMember("src_url"))
+    {
+        url = WebCrawler::s_allNewsSrc.at(key)["src_url"].asString();
+        url.replace(url.find(m_paraMark), m_paraMark.length(), month);
+    }
+
     return url;
 }
 
@@ -321,9 +326,19 @@ HttpRequestPtr src_ckxx::CreateRequest(const drogon::HttpClientPtr& client) cons
 
 std::string src_ckxx::srcURL() const
 {
-    std::string url{"https://china.cankaoxiaoxi.com/json/channel/"};
-    url += m_parameter;
-    return url + "/list.json";
+    std::string key = className();
+    if (key.find("src_") == 0)
+        key = key.substr(4);
+
+    std::string url;
+    if (WebCrawler::s_allNewsSrc.find(key) != WebCrawler::s_allNewsSrc.end() &&
+        WebCrawler::s_allNewsSrc.at(key).isMember("src_url"))
+    {
+        url = WebCrawler::s_allNewsSrc.at(key)["src_url"].asString();
+        url.replace(url.find(m_paraMark), m_paraMark.length(), m_parameter);
+    }
+
+    return url;
 }
 
 Json::Value src_ckxx::ParseData(const HttpResponsePtr& pResp) const
@@ -361,11 +376,6 @@ HttpRequestPtr src_douban::CreateRequest(const drogon::HttpClientPtr& client) co
 {
     client->setUserAgent("Mozilla/5.0 (iPhone; CPU iPhone OS 15_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/15.0 Mobile/15E148 Safari/604.1");
     return HttpRequest::newHttpRequest();
-}
-
-std::string src_douban::srcURL() const
-{
-    return "https://movie.douban.com/chart";
 }
 
 Json::Value src_douban::ParseData(const HttpResponsePtr& pResp) const
@@ -501,11 +511,6 @@ HttpRequestPtr src_douban_group::CreateRequest(const drogon::HttpClientPtr& clie
     return pReq;
 }
 
-std::string src_douban_group::srcURL() const
-{
-    return "https://www.douban.com/group/explore";
-}
-
 Json::Value src_douban_group::ParseData(const HttpResponsePtr& pResp) const
 {
     Json::Value finalResp;
@@ -594,11 +599,6 @@ HttpRequestPtr src_douyin::CreateRequest(const drogon::HttpClientPtr& client) co
     return HttpRequest::newHttpRequest();
 }
 
-std::string src_douyin::srcURL() const
-{
-    return "https://aweme.snssdk.com/aweme/v1/hot/search/list/?device_platform=android&version_name=13.2.0&version_code=130200&aid=1128";
-}
-
 Json::Value src_douyin::ParseData(const HttpResponsePtr& pResp) const
 {
     Json::Value finalResp;
@@ -636,11 +636,6 @@ HttpRequestPtr src_douyin_music::CreateRequest(const drogon::HttpClientPtr& clie
 {
     client->setUserAgent("okhttp3");
     return HttpRequest::newHttpRequest();
-}
-
-std::string src_douyin_music::srcURL() const
-{
-    return "https://aweme.snssdk.com/aweme/v1/chart/music/list/?device_platform=android&version_name=13.2.0&version_code=130200&aid=1128&chart_id=6853972723954146568&count=100";
 }
 
 Json::Value src_douyin_music::ParseData(const HttpResponsePtr& pResp) const
@@ -684,11 +679,6 @@ HttpRequestPtr src_gcores::CreateRequest(const drogon::HttpClientPtr& client) co
     return HttpRequest::newHttpRequest();
 }
 
-std::string src_gcores::srcURL() const
-{
-    return "https://www.gcores.com/rss";
-}
-
 Json::Value src_gcores::ParseData(const HttpResponsePtr& pResp) const
 {
     Json::Value finalResp;
@@ -724,7 +714,6 @@ Json::Value src_gcores::ParseData(const HttpResponsePtr& pResp) const
             eachPost["time"] = itr->node().child_value("pubDate");
             strVal = itr->node().child_value("link");
             eachPost["url"] = strVal;
-            strVal = strVal.replace(strVal.find("www."), 4, "m.");
             eachPost["mobileUrl"] = strVal;
             finalResp["data"].append(eachPost);
         }
@@ -741,11 +730,6 @@ Json::Value src_gcores::ParseData(const HttpResponsePtr& pResp) const
 HttpRequestPtr src_github::CreateRequest(const drogon::HttpClientPtr& client) const
 {
     return HttpRequest::newHttpRequest();
-}
-
-std::string src_github::srcURL() const
-{
-    return "https://github.com/trending";
 }
 
 Json::Value src_github::ParseData(const HttpResponsePtr& pResp) const
@@ -842,11 +826,6 @@ HttpRequestPtr src_hupu::CreateRequest(const drogon::HttpClientPtr& client) cons
     return HttpRequest::newHttpRequest();
 }
 
-std::string src_hupu::srcURL() const
-{
-    return "https://bbs.hupu.com/topic-daily-hot";
-}
-
 Json::Value src_hupu::ParseData(const HttpResponsePtr& pResp) const
 {
     Json::Value finalResp;
@@ -912,18 +891,11 @@ HttpRequestPtr src_huxiu::CreateRequest(const drogon::HttpClientPtr& client) con
     return HttpRequest::newHttpRequest();
 }
 
-std::string src_huxiu::srcURL() const
-{
-    // https://rss.huxiu.com/  下载非常慢
-    // 因此用github action 中转
-    return "https://raw.githubusercontent.com/shankun/facade/refs/heads/auto-work/cache/huxiu-rss.xml";
-}
-
 Json::Value src_huxiu::ParseData(const HttpResponsePtr& pResp) const
 {
     Json::Value finalResp;
     // 返回格式为text/xml
-    if ((pResp->contentType() != CT_TEXT_PLAIN) || pResp->body().empty())
+    if ((pResp->contentType() != CT_TEXT_XML) || pResp->body().empty())
     {
         finalResp["code"] = static_cast<int>(k500InternalServerError);
         finalResp["message"] = "虎嗅 返回内容格式错误！";
@@ -975,18 +947,11 @@ HttpRequestPtr src_ithome::CreateRequest(const drogon::HttpClientPtr& client) co
     return HttpRequest::newHttpRequest();
 }
 
-std::string src_ithome::srcURL() const
-{
-    // https://www.ithome.com/rss  下载非常慢
-    // 因此用github action 中转
-    return "https://raw.githubusercontent.com/shankun/facade/refs/heads/auto-work/cache/ithome-rss.xml";
-}
-
 Json::Value src_ithome::ParseData(const HttpResponsePtr& pResp) const
 {
     Json::Value finalResp;
     // 返回格式为text/xml
-    if ((pResp->contentType() != CT_TEXT_PLAIN) || pResp->body().empty())
+    if ((pResp->contentType() != CT_TEXT_XML) || pResp->body().empty())
     {
         finalResp["code"] = static_cast<int>(k500InternalServerError);
         finalResp["message"] = "ithome 返回内容格式错误！";
@@ -1035,11 +1000,6 @@ HttpRequestPtr src_jianshu::CreateRequest(const drogon::HttpClientPtr& client) c
     return HttpRequest::newHttpRequest();
 }
 
-std::string src_jianshu::srcURL() const
-{
-    return "https://www.jianshu.com/programmers?page=1&type_id=27&count=20";
-}
-
 Json::Value src_jianshu::ParseData(const HttpResponsePtr& pResp) const
 {
     Json::Value finalResp;
@@ -1076,11 +1036,6 @@ Json::Value src_jianshu::ParseData(const HttpResponsePtr& pResp) const
 HttpRequestPtr src_juejin::CreateRequest(const drogon::HttpClientPtr& client) const
 {
     return HttpRequest::newHttpRequest();
-}
-
-std::string src_juejin::srcURL() const
-{
-    return "https://api.juejin.cn/content_api/v1/content/article_rank?category_id=1&type=hot";
 }
 
 Json::Value src_juejin::ParseData(const HttpResponsePtr& pResp) const
@@ -1121,16 +1076,11 @@ HttpRequestPtr src_kuaishou::CreateRequest(const drogon::HttpClientPtr& client) 
     return HttpRequest::newHttpRequest();
 }
 
-std::string src_kuaishou::srcURL() const
-{
-    return "https://raw.githubusercontent.com/shankun/facade/refs/heads/auto-work/cache/kuaishou.html";
-}
-
 Json::Value src_kuaishou::ParseData(const HttpResponsePtr& pResp) const
 {
     Json::Value finalResp;
 
-    if (pResp->contentType() != CT_TEXT_PLAIN)
+    if (pResp->contentType() != CT_TEXT_HTML)
     {
         finalResp["code"] = static_cast<int>(k500InternalServerError);
         finalResp["message"] = "快手 返回内容格式错误！";
@@ -1201,11 +1151,6 @@ HttpRequestPtr src_netease::CreateRequest(const drogon::HttpClientPtr& client) c
     return HttpRequest::newHttpRequest();
 }
 
-std::string src_netease::srcURL() const
-{
-    return "https://m.163.com/fe/api/hot/news/flow";
-}
-
 Json::Value src_netease::ParseData(const HttpResponsePtr& pResp) const
 {
     Json::Value finalResp;
@@ -1257,8 +1202,19 @@ HttpRequestPtr src_netease_music::CreateRequest(const drogon::HttpClientPtr& cli
 
 std::string src_netease_music::srcURL() const
 {
-    std::string url{"https://music.163.com/discover/toplist?id="};
-    return url + m_parameter;
+    std::string key = className();
+    if (key.find("src_") == 0)
+        key = key.substr(4);
+
+    std::string url;
+    if (WebCrawler::s_allNewsSrc.find(key) != WebCrawler::s_allNewsSrc.end() &&
+        WebCrawler::s_allNewsSrc.at(key).isMember("src_url"))
+    {
+        url = WebCrawler::s_allNewsSrc.at(key)["src_url"].asString();
+        url.replace(url.find(m_paraMark), m_paraMark.length(), m_parameter);
+    }
+
+    return url;
 }
 
 Json::Value src_netease_music::ParseData(const HttpResponsePtr& pResp) const
@@ -1340,11 +1296,6 @@ HttpRequestPtr src_newsqq::CreateRequest(const drogon::HttpClientPtr& client) co
     return HttpRequest::newHttpRequest();
 }
 
-std::string src_newsqq::srcURL() const
-{
-    return "https://r.inews.qq.com/gw/event/hot_ranking_list?page_size=50";
-}
-
 Json::Value src_newsqq::ParseData(const HttpResponsePtr& pResp) const
 {
     Json::Value finalResp;
@@ -1391,8 +1342,18 @@ HttpRequestPtr src_qq_music::CreateRequest(const drogon::HttpClientPtr& client) 
 
 std::string src_qq_music::srcURL() const
 {
-    std::string url{"https://c.y.qq.com/v8/fcg-bin/fcg_v8_toplist_cp.fcg?topid="};
-    url += m_parameter + "&platform=yqq.json&jsonpCallback=MusicJsonCallbacktoplist";
+    std::string key = className();
+    if (key.find("src_") == 0)
+        key = key.substr(4);
+
+    std::string url;
+    if (WebCrawler::s_allNewsSrc.find(key) != WebCrawler::s_allNewsSrc.end() &&
+        WebCrawler::s_allNewsSrc.at(key).isMember("src_url"))
+    {
+        url = WebCrawler::s_allNewsSrc.at(key)["src_url"].asString();
+        url.replace(url.find(m_paraMark), m_paraMark.length(), m_parameter);
+    }
+
     return url;
 }
 
@@ -1477,11 +1438,6 @@ HttpRequestPtr src_rustcc::CreateRequest(const drogon::HttpClientPtr& client) co
     return HttpRequest::newHttpRequest();
 }
 
-std::string src_rustcc::srcURL() const
-{
-    return "https://rustcc.cn/rss";
-}
-
 Json::Value src_rustcc::ParseData(const HttpResponsePtr& pResp) const
 {
     Json::Value finalResp;
@@ -1547,10 +1503,20 @@ HttpRequestPtr src_sina::CreateRequest(const drogon::HttpClientPtr& client) cons
 
 std::string src_sina::srcURL() const
 {
-    std::string url{"https://top.news.sina.com.cn/ws/GetTopDataList.php?top_type=day&top_cat="};
     bool local = (trantor::Date::now().microSecondsSinceEpoch() % 2 == 0);
-    url += local ? "news_china_suda" : "news_world_suda";
-    url += "&top_time=today&top_show_num=20&top_order=DESC&short_title=1&js_var=hotNewsData";
+    const std::string typeStr = (local ? "news_china_suda" : "news_world_suda");
+    std::string key = className();
+    if (key.find("src_") == 0)
+        key = key.substr(4);
+
+    std::string url;
+    if (WebCrawler::s_allNewsSrc.find(key) != WebCrawler::s_allNewsSrc.end() &&
+        WebCrawler::s_allNewsSrc.at(key).isMember("src_url"))
+    {
+        url = WebCrawler::s_allNewsSrc.at(key)["src_url"].asString();
+        url.replace(url.find(m_paraMark), m_paraMark.length(), typeStr);
+    }
+
     return url;
 }
 
@@ -1629,11 +1595,6 @@ HttpRequestPtr src_smth::CreateRequest(const drogon::HttpClientPtr& client) cons
     return HttpRequest::newHttpRequest();
 }
 
-std::string src_smth::srcURL() const
-{
-    return "https://www.newsmth.net/nForum/rss/topten";
-}
-
 Json::Value src_smth::ParseData(const HttpResponsePtr& pResp) const
 {
     Json::Value finalResp;
@@ -1694,11 +1655,6 @@ HttpRequestPtr src_sspai::CreateRequest(const drogon::HttpClientPtr& client) con
     return HttpRequest::newHttpRequest();
 }
 
-std::string src_sspai::srcURL() const
-{
-    return "https://sspai.com/api/v1/article/tag/page/get?limit=40&tag=热门文章";
-}
-
 Json::Value src_sspai::ParseData(const HttpResponsePtr& pResp) const
 {
     Json::Value finalResp;
@@ -1738,11 +1694,6 @@ Json::Value src_sspai::ParseData(const HttpResponsePtr& pResp) const
 HttpRequestPtr src_solidot::CreateRequest(const drogon::HttpClientPtr& client) const
 {
     return HttpRequest::newHttpRequest();
-}
-
-std::string src_solidot::srcURL() const
-{
-    return "https://www.solidot.org/index.rss";
 }
 
 Json::Value src_solidot::ParseData(const HttpResponsePtr& pResp) const
@@ -1807,18 +1758,11 @@ HttpRequestPtr src_thepaper::CreateRequest(const drogon::HttpClientPtr& client) 
     return HttpRequest::newHttpRequest();
 }
 
-std::string src_thepaper::srcURL() const
-{
-    // https://cache.thepaper.cn/contentapi/wwwIndex/rightSidebar 下载非常慢
-    // 因此用github action 中转
-    return "https://raw.githubusercontent.com/shankun/facade/refs/heads/auto-work/cache/the-paper.json";
-}
-
 Json::Value src_thepaper::ParseData(const HttpResponsePtr& pResp) const
 {
     Json::Value finalResp;
 
-    if ((pResp->contentType() != CT_TEXT_PLAIN) || 
+    if ((pResp->contentType() != CT_APPLICATION_JSON) || 
         !(pResp->jsonObject()))
     {
         finalResp["code"] = static_cast<int>(k500InternalServerError);
@@ -1853,11 +1797,6 @@ Json::Value src_thepaper::ParseData(const HttpResponsePtr& pResp) const
 HttpRequestPtr src_tieba::CreateRequest(const drogon::HttpClientPtr& client) const
 {
     return HttpRequest::newHttpRequest();
-}
-
-std::string src_tieba::srcURL() const
-{
-    return "https://tieba.baidu.com/hottopic/browse/topicList";
 }
 
 Json::Value src_tieba::ParseData(const HttpResponsePtr& pResp) const
@@ -1895,11 +1834,6 @@ Json::Value src_tieba::ParseData(const HttpResponsePtr& pResp) const
 HttpRequestPtr src_toutiao::CreateRequest(const drogon::HttpClientPtr& client) const
 {
     return HttpRequest::newHttpRequest();
-}
-
-std::string src_toutiao::srcURL() const
-{
-    return "https://www.toutiao.com/hot-event/hot-board/?origin=toutiao_pc";
 }
 
 Json::Value src_toutiao::ParseData(const HttpResponsePtr& pResp) const
@@ -1941,11 +1875,6 @@ HttpRequestPtr src_v2ex::CreateRequest(const drogon::HttpClientPtr& client) cons
 {
     client->setUserAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36 Edg/114.0.1823.67");
     return HttpRequest::newHttpRequest();
-}
-
-std::string src_v2ex::srcURL() const
-{
-    return "https://v2ex.com";
 }
 
 Json::Value src_v2ex::ParseData(const HttpResponsePtr& pResp) const
@@ -1995,12 +1924,14 @@ Json::Value src_v2ex::ParseData(const HttpResponsePtr& pResp) const
 
 HttpRequestPtr src_weibo::CreateRequest(const drogon::HttpClientPtr& client) const
 {
-    return HttpRequest::newHttpRequest();
-}
-
-std::string src_weibo::srcURL() const
-{
-    return "https://weibo.com/ajax/side/hotSearch";
+    client->setUserAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36 Edg/114.0.1823.67");
+    auto pReq = HttpRequest::newHttpRequest();
+    pReq->addHeader("accept", "application/json, text/plain, */*");
+    pReq->addHeader("accept-language", "zh-CN,zh;q=0.9,en;q=0.8");
+    pReq->addHeader("cache-control", "max-age=0");
+    pReq->addHeader("Referer", "https://weibo.com/");
+    pReq->addHeader("X-Requested-With", "XMLHttpRequest");
+    return pReq;
 }
 
 Json::Value src_weibo::ParseData(const HttpResponsePtr& pResp) const
@@ -2040,11 +1971,6 @@ HttpRequestPtr src_weread::CreateRequest(const drogon::HttpClientPtr& client) co
 {
     client->setUserAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36 Edg/114.0.1823.67");
     return HttpRequest::newHttpRequest();
-}
-
-std::string src_weread::srcURL() const
-{
-    return "https://weread.qq.com/web/bookListInCategory/rising?rank=1";
 }
 
 Json::Value src_weread::ParseData(const HttpResponsePtr& pResp) const
@@ -2113,11 +2039,6 @@ HttpRequestPtr src_zhihu::CreateRequest(const drogon::HttpClientPtr& client) con
     }
 
     return HttpRequest::newHttpRequest();
-}
-
-std::string src_zhihu::srcURL() const
-{
-    return "https://www.zhihu.com/api/v4/feed/topstory/hot-lists/total?limit=20";
 }
 
 Json::Value src_zhihu::ParseData(const HttpResponsePtr& pResp) const

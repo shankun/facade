@@ -2,7 +2,7 @@
 
 #include "web_crawler.h"
 
-#define REGISTERFEEDCLASS(className) \
+#define REGISTERFEEDCLASSU(className) \
 class src_##className : public dailyhot::FeedObject<src_##className>, public WebCrawler { \
 public: \
 	src_##className() {} \
@@ -11,12 +11,20 @@ public: \
 	virtual Json::Value ParseData(const drogon::HttpResponsePtr& pResp) const override; \
 };
 
+#define REGISTERFEEDCLASS(className) \
+class src_##className : public dailyhot::FeedObject<src_##className>, public WebCrawler { \
+public: \
+	src_##className() {} \
+    virtual drogon::HttpRequestPtr CreateRequest(const drogon::HttpClientPtr& client) const override; \
+	virtual Json::Value ParseData(const drogon::HttpResponsePtr& pResp) const override; \
+};
+
 REGISTERFEEDCLASS(36kr)
 REGISTERFEEDCLASS(baidu)
-REGISTERFEEDCLASS(bestblogs)
+REGISTERFEEDCLASSU(bestblogs)
 REGISTERFEEDCLASS(bilibili)
-REGISTERFEEDCLASS(calendar)
-REGISTERFEEDCLASS(ckxx)
+REGISTERFEEDCLASSU(calendar)
+REGISTERFEEDCLASSU(ckxx)
 REGISTERFEEDCLASS(douban)
 REGISTERFEEDCLASS(douban_group)
 REGISTERFEEDCLASS(douyin)
@@ -30,11 +38,11 @@ REGISTERFEEDCLASS(jianshu)
 REGISTERFEEDCLASS(juejin)
 REGISTERFEEDCLASS(kuaishou)
 REGISTERFEEDCLASS(netease)
-REGISTERFEEDCLASS(netease_music)
+REGISTERFEEDCLASSU(netease_music)
 REGISTERFEEDCLASS(newsqq)
-REGISTERFEEDCLASS(qq_music)
+REGISTERFEEDCLASSU(qq_music)
 REGISTERFEEDCLASS(rustcc)
-REGISTERFEEDCLASS(sina)
+REGISTERFEEDCLASSU(sina)
 REGISTERFEEDCLASS(smth)
 REGISTERFEEDCLASS(solidot)
 REGISTERFEEDCLASS(sspai)

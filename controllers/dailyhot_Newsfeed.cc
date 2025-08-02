@@ -8,54 +8,21 @@
 using namespace dailyhot;
 
 Newsfeed::Newsfeed()
-: m_allNewsSrc({{"36kr", {"36氪", "热榜"}},
-                {"baidu", {"百度", "热搜榜"}},
-                {"bestblogs", {"BestBlogs", "一周精选"}},
-                {"bilibili", {"哔哩哔哩", "热门榜"}},
-                {"calendar", {"历史上的今天", "历史事件"}},
-                {"ckxx", {"参考消息", "频道"}},
-                {"douban", {"豆瓣", "新片榜"}},
-                {"douban_group", {"豆瓣小组", "精选话题"}},
-                {"douyin", {"抖音", "热点榜"}},
-                {"douyin_music", {"抖音", "热歌榜"}},
-                {"gcores", {"机核", "资讯"}},
-                {"github", {"Github", "Trending"}},
-                {"hupu", {"虎扑步行街", "24小时榜"}},
-                {"huxiu", {"虎嗅", "最新资讯"}},
-                {"ithome", {"IT之家", "热榜"}},
-                {"jianshu", {"简书", "后端开发技术"}},
-                {"juejin", {"稀土掘金", "热榜"}},
-                {"kuaishou", {"快手", "热榜"}},
-                {"netease", {"网易新闻", "热点榜"}},
-                {"netease_music", {"网易云音乐", "排行榜"}},
-                {"newsqq", {"腾讯新闻", "热点榜"}},
-                {"qq_music", {"QQ音乐", "排行榜"}},
-                {"rustcc", {"Rust中文社区", "最新贴子"}},
-                {"sina", {"新浪新闻", "最新新闻"}},
-                {"smth", {"水木社区", "十大话题"}},
-                {"solidot", {"Solidot", "最新资讯"}},
-                {"sspai", {"少数派", "热榜"}},
-                {"thepaper", {"澎湃新闻", "热榜"}},
-                {"tieba", {"百度贴吧", "热议榜"}},
-                {"toutiao", {"今日头条", "热榜"}},
-                {"v2ex", {"v2ex论坛", "新帖"}},
-                {"weibo", {"微博", "热搜榜"}},
-                {"weread", {"微信读书", "飙升榜"}},
-                {"zhihu", {"知乎", "热榜"}}
-               })
-, m_ckxxChannels({"zhongguo", "gj", "guandian", "ruick", 
-                  "tiyujk", "kejiyy", "wenhualy", 
-                  "cankaomt", "cankaozk", "junshi"
-                })
-, m_wyCategories({"19723756", "3779629", "2884035", "3778678"})
-, m_qqCategories({"62", "26", "27", "4", "52", "67"})
-, m_typeRankName({{"19723756", "飙升榜"}, {"3779629", "新歌榜"}, 
-                  {"2884035", "原创榜"}, {"3778678", "热歌榜"},
-                  {"62", "飙升榜"}, {"26", "热歌榜"}, 
-                  {"27", "新歌榜"}, {"4", "流行指数榜"}, 
-                  {"52", "腾讯音乐人原创榜"}, {"67", "听歌识曲榜"}})
-, m_bestBlogsCategories({"programming", "ai"})
 {
+    if (WebCrawler::s_allNewsSrc.empty())
+    {
+        const Json::Value& srcList = app().getCustomConfig()["feed_src"];
+        if (srcList.isArray() && !srcList.empty())
+        {
+            std::for_each(srcList.begin(), srcList.end(), [this](const Json::Value &src) {
+                if (src.isObject() && src.isMember("class"))
+                {
+                    const std::string key = src["class"].asString();
+                    WebCrawler::s_allNewsSrc[key] = src;
+                }
+            });
+        }
+    }
 }
 
 Task<> Newsfeed::GetHotList(HttpRequestPtr req, 
@@ -70,14 +37,14 @@ Task<> Newsfeed::GetHotList(HttpRequestPtr req,
         content["message"] = "获取成功";
         content["name"] = "全部接口";
         content["subtitle"] = "除了特殊接口外的全部接口列表";
-        content["total"] = m_allNewsSrc.size();
+        content["total"] = WebCrawler::s_allNewsSrc.size();
         
-        for (const auto& [k, v] : m_allNewsSrc)
+        for (const auto& [k, v] : WebCrawler::s_allNewsSrc)
         {
             Json::Value item;
             item["name"] = k;
-            item["title"] = v.first;
-            item["subtitle"] = v.second;
+            item["title"] = v["name"].asString();
+            item["subtitle"] = v["title"].asString();
             Json::Value subItem;
             subItem["opts"]["end"] = true;
             subItem["opts"]["name"].isNull();
@@ -103,7 +70,7 @@ Task<> Newsfeed::GetHotList(HttpRequestPtr req,
         co_return;
     }
 
-    if (m_allNewsSrc.find(source) == m_allNewsSrc.end())
+    if (WebCrawler::s_allNewsSrc.find(source) == WebCrawler::s_allNewsSrc.end())
     {
         auto resp = HttpResponse::newNotFoundResponse();
         callback(resp);
@@ -242,7 +209,7 @@ Task<> Newsfeed::Calendar(HttpRequestPtr req,
                     content["from"] = "server";
                     content["total"] = content["data"].size();
                     content["updateTime"] = trantor::Date::now().toDbStringLocal();
-                    content["subtitle"] = m_allNewsSrc.at("calendar").second;
+                    content["subtitle"] = WebCrawler::s_allNewsSrc.at("calendar")["title"].asString();
                     content["source"] = "calendar";
                 }
             }
@@ -309,10 +276,25 @@ LOG_INFO << "URL: " << req_path;
                 respData["from"] = "server";
                 respData["total"] = respData["data"].size();
                 respData["updateTime"] = trantor::Date::now().toDbStringLocal();
-                if (m_typeRankName.find(type) != m_typeRankName.end())
-                    val_str = m_typeRankName.at(type);
-                else
-                    val_str = m_allNewsSrc.at(src).second;
+                if (WebCrawler::s_allNewsSrc.at(src).isMember("categories"))
+                {
+                    const Json::Value& categories = WebCrawler::s_allNewsSrc.at(src)["categories"];
+                    if (categories.isArray() && !categories.empty() && 
+                        categories.front().isObject() && !type.empty())
+                    {
+                        for (const auto& item : categories)
+                        {
+                            if (item.isMember(type))
+                            {
+                                val_str = item[type].asString();
+                                break;
+                            }
+                        }
+                    }
+                }
+                
+                if (val_str.empty() && WebCrawler::s_allNewsSrc.at(src).isMember("title"))
+                    val_str = WebCrawler::s_allNewsSrc.at(src)["title"].asString();
                 
                 respData["subtitle"] = val_str;
                 respData["source"] = src;
@@ -355,14 +337,26 @@ std::string Newsfeed::GetTypeId(const std::string& src, int type_val) const
     // BestBlogs需要传入指定榜单类别
     // type: 1=软件编程；2=人工智能
 
-    if (src == "ckxx")
-        type_str = m_ckxxChannels[type_val - 1];
-    else if (src == "netease_music")
-        type_str = m_wyCategories[type_val - 1];
-    else if (src == "qq_music")
-        type_str = m_qqCategories[type_val - 1];
-    else if (src == "bestblogs")
-        type_str = m_bestBlogsCategories[type_val - 1];
+    if (WebCrawler::s_allNewsSrc.find(src) == WebCrawler::s_allNewsSrc.end() || 
+        !WebCrawler::s_allNewsSrc.at(src).isMember("categories"))
+    {
+        return type_str;
+    }
+
+    const Json::Value& categories = WebCrawler::s_allNewsSrc.at(src)["categories"];
+    if (!categories.isArray() || type_val < 1 || type_val > static_cast<int>(categories.size()))
+        return type_str;
+
+    if (categories[type_val - 1].isObject())
+    {
+        const std::vector<std::string>& keys = categories[type_val - 1].getMemberNames();
+        if (!keys.empty())
+            type_str = keys.front();
+    }
+    else if (categories[type_val - 1].isString())
+    {
+        type_str = categories[type_val - 1].asString();
+    }
     
     return type_str;
 }

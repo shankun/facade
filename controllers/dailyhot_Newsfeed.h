@@ -50,15 +50,6 @@ class Newsfeed : public HttpController<Newsfeed>
 
     // 从本地数据中随机读取一条一言
     HttpResponsePtr PickHitokoto() const;
-
-    // 所有新闻来源
-    const std::map<std::string, std::pair<std::string, std::string> > m_allNewsSrc;
-
-    const std::vector<std::string> m_ckxxChannels; // 参考消息频道
-    const std::vector<std::string> m_wyCategories; // 网易云音乐榜单
-    const std::vector<std::string> m_qqCategories; // QQ音乐榜单
-    const std::map<std::string, std::string> m_typeRankName; // 音乐榜单名
-    const std::vector<std::string> m_bestBlogsCategories; // BestBlogs栏目
 };
 }
 
