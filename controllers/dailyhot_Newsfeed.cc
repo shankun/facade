@@ -179,13 +179,13 @@ Task<> Newsfeed::Calendar(HttpRequestPtr req,
     else
     {
         pSource->SetParameter(month);
-        std::string req_path = pSource->srcURL();
-        auto client = CreateHttpClient(req_path);
+        std::string url = pSource->srcURL();
+        auto client = CreateHttpClient(url);
         
         try
         {
             auto req = pSource->CreateRequest(client);
-            req->setPath(req_path);
+            req->setPath(url);
 
             auto resp = co_await client->sendRequestCoro(req);
 
