@@ -669,7 +669,7 @@
                 "class": "rustcc",
                 "name": "Rust中文社区",
                 "title": "最新贴子",
-                "src_url": "https://rustcc.cn/rss"
+                "src_url": "http://hc.hongye.com.cn:8083/hcitydata/dbs/rustcc-rss.xml"
             },
             {
                 "class": "sina",

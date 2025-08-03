@@ -8,6 +8,10 @@
 using namespace dailyhot;
 using namespace drogon;
 
+void src_36kr::SetParameter(const std::string& subtype)
+{
+}
+
 HttpRequestPtr src_36kr::CreateRequest(const drogon::HttpClientPtr& client) const
 {
     Json::Value params;
@@ -50,6 +54,10 @@ Json::Value src_36kr::ParseData(const HttpResponsePtr& pResp) const
     }
 
     return finalResp;
+}
+
+void src_baidu::SetParameter(const std::string& subtype)
+{
 }
 
 HttpRequestPtr src_baidu::CreateRequest(const drogon::HttpClientPtr& client) const
@@ -137,26 +145,14 @@ Json::Value src_baidu::ParseData(const HttpResponsePtr& pResp) const
     return finalResp;
 }
 
+void src_bestblogs::SetParameter(const std::string& subtype)
+{
+    m_parameter = subtype;
+}
+
 HttpRequestPtr src_bestblogs::CreateRequest(const drogon::HttpClientPtr& client) const
 {
     return HttpRequest::newHttpRequest();
-}
-
-std::string src_bestblogs::srcURL() const
-{
-    std::string key = className();
-    if (key.find("src_") == 0)
-        key = key.substr(4);
-
-    std::string url;
-    if (WebCrawler::s_allNewsSrc.find(key) != WebCrawler::s_allNewsSrc.end() &&
-        WebCrawler::s_allNewsSrc.at(key).isMember("src_url"))
-    {
-        url = WebCrawler::s_allNewsSrc.at(key)["src_url"].asString();
-        url.replace(url.find(m_paraMark), m_paraMark.length(), m_parameter);
-    }
-
-    return url;
 }
 
 Json::Value src_bestblogs::ParseData(const HttpResponsePtr& pResp) const
@@ -207,6 +203,10 @@ Json::Value src_bestblogs::ParseData(const HttpResponsePtr& pResp) const
     return finalResp;
 }
 
+void src_bilibili::SetParameter(const std::string& subtype)
+{
+}
+
 HttpRequestPtr src_bilibili::CreateRequest(const drogon::HttpClientPtr& client) const
 {
     return HttpRequest::newHttpRequest();
@@ -248,27 +248,16 @@ Json::Value src_bilibili::ParseData(const HttpResponsePtr& pResp) const
     return finalResp;
 }
 
+void src_calendar::SetParameter(const std::string& subtype)
+{
+    m_parameter = subtype;
+    if (m_parameter.empty())
+        m_parameter = trantor::Date::now().toCustomFormattedStringLocal("%m");
+}
+
 HttpRequestPtr src_calendar::CreateRequest(const drogon::HttpClientPtr& client) const
 {
     return HttpRequest::newHttpRequest();
-}
-
-std::string src_calendar::srcURL() const
-{
-    const std::string month = trantor::Date::now().toCustomFormattedStringLocal("%m");
-    std::string key = className();
-    if (key.find("src_") == 0)
-        key = key.substr(4);
-
-    std::string url;
-    if (WebCrawler::s_allNewsSrc.find(key) != WebCrawler::s_allNewsSrc.end() &&
-        WebCrawler::s_allNewsSrc.at(key).isMember("src_url"))
-    {
-        url = WebCrawler::s_allNewsSrc.at(key)["src_url"].asString();
-        url.replace(url.find(m_paraMark), m_paraMark.length(), month);
-    }
-
-    return url;
 }
 
 Json::Value src_calendar::ParseData(const HttpResponsePtr& pResp) const
@@ -284,11 +273,12 @@ Json::Value src_calendar::ParseData(const HttpResponsePtr& pResp) const
     }
 
     const Json::Value& root = *(pResp->jsonObject());
-    std::string month;
-    for (auto itr = root.begin(); itr != root.end() ; itr++)
-        month = itr.key().asString();
 
-    const std::string date = m_parameter.empty() ?
+    std::string month;
+    if (!root.getMemberNames().empty())
+        month = root.getMemberNames().front();
+
+    const std::string date = m_parameter.length() < 4 ?
      trantor::Date::now().toCustomFormattedStringLocal("%m%d") : m_parameter;
 
     if (root[month][date].isArray())
@@ -319,26 +309,14 @@ Json::Value src_calendar::ParseData(const HttpResponsePtr& pResp) const
     return finalResp;
 }
 
+void src_ckxx::SetParameter(const std::string& subtype)
+{
+    m_parameter = subtype;
+}
+
 HttpRequestPtr src_ckxx::CreateRequest(const drogon::HttpClientPtr& client) const
 {
     return HttpRequest::newHttpRequest();
-}
-
-std::string src_ckxx::srcURL() const
-{
-    std::string key = className();
-    if (key.find("src_") == 0)
-        key = key.substr(4);
-
-    std::string url;
-    if (WebCrawler::s_allNewsSrc.find(key) != WebCrawler::s_allNewsSrc.end() &&
-        WebCrawler::s_allNewsSrc.at(key).isMember("src_url"))
-    {
-        url = WebCrawler::s_allNewsSrc.at(key)["src_url"].asString();
-        url.replace(url.find(m_paraMark), m_paraMark.length(), m_parameter);
-    }
-
-    return url;
 }
 
 Json::Value src_ckxx::ParseData(const HttpResponsePtr& pResp) const
@@ -370,6 +348,10 @@ Json::Value src_ckxx::ParseData(const HttpResponsePtr& pResp) const
     }
 
     return finalResp;
+}
+
+void src_douban::SetParameter(const std::string& subtype)
+{
 }
 
 HttpRequestPtr src_douban::CreateRequest(const drogon::HttpClientPtr& client) const
@@ -494,6 +476,10 @@ Json::Value src_douban::ParseData(const HttpResponsePtr& pResp) const
     return finalResp;
 }
 
+void src_douban_group::SetParameter(const std::string& subtype)
+{
+}
+
 HttpRequestPtr src_douban_group::CreateRequest(const drogon::HttpClientPtr& client) const
 {
     auto pReq = HttpRequest::newHttpRequest();
@@ -593,6 +579,10 @@ Json::Value src_douban_group::ParseData(const HttpResponsePtr& pResp) const
     return finalResp;
 }
 
+void src_douyin::SetParameter(const std::string& subtype)
+{
+}
+
 HttpRequestPtr src_douyin::CreateRequest(const drogon::HttpClientPtr& client) const
 {
     client->setUserAgent("okhttp3");
@@ -630,6 +620,10 @@ Json::Value src_douyin::ParseData(const HttpResponsePtr& pResp) const
     }
 
     return finalResp;
+}
+
+void src_douyin_music::SetParameter(const std::string& subtype)
+{
 }
 
 HttpRequestPtr src_douyin_music::CreateRequest(const drogon::HttpClientPtr& client) const
@@ -671,6 +665,10 @@ Json::Value src_douyin_music::ParseData(const HttpResponsePtr& pResp) const
     }
 
     return finalResp;
+}
+
+void src_gcores::SetParameter(const std::string& subtype)
+{
 }
 
 HttpRequestPtr src_gcores::CreateRequest(const drogon::HttpClientPtr& client) const
@@ -725,6 +723,10 @@ Json::Value src_gcores::ParseData(const HttpResponsePtr& pResp) const
     }
 
     return finalResp;
+}
+
+void src_github::SetParameter(const std::string& subtype)
+{
 }
 
 HttpRequestPtr src_github::CreateRequest(const drogon::HttpClientPtr& client) const
@@ -820,6 +822,10 @@ Json::Value src_github::ParseData(const HttpResponsePtr& pResp) const
     return finalResp;
 }
 
+void src_hupu::SetParameter(const std::string& subtype)
+{
+}
+
 HttpRequestPtr src_hupu::CreateRequest(const drogon::HttpClientPtr& client) const
 {
     client->setUserAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36 Edg/114.0.1823.67");
@@ -885,6 +891,10 @@ Json::Value src_hupu::ParseData(const HttpResponsePtr& pResp) const
     return finalResp;
 }
 
+void src_huxiu::SetParameter(const std::string& subtype)
+{
+}
+
 HttpRequestPtr src_huxiu::CreateRequest(const drogon::HttpClientPtr& client) const
 {
     client->setUserAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36 Edg/114.0.1823.67");
@@ -941,6 +951,10 @@ Json::Value src_huxiu::ParseData(const HttpResponsePtr& pResp) const
     return finalResp;
 }
 
+void src_ithome::SetParameter(const std::string& subtype)
+{
+}
+
 HttpRequestPtr src_ithome::CreateRequest(const drogon::HttpClientPtr& client) const
 {
     client->setUserAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36 Edg/131.0.0.0");
@@ -995,6 +1009,10 @@ Json::Value src_ithome::ParseData(const HttpResponsePtr& pResp) const
     return finalResp;
 }
 
+void src_jianshu::SetParameter(const std::string& subtype)
+{
+}
+
 HttpRequestPtr src_jianshu::CreateRequest(const drogon::HttpClientPtr& client) const
 {
     return HttpRequest::newHttpRequest();
@@ -1033,6 +1051,10 @@ Json::Value src_jianshu::ParseData(const HttpResponsePtr& pResp) const
     return finalResp;
 }
 
+void src_juejin::SetParameter(const std::string& subtype)
+{
+}
+
 HttpRequestPtr src_juejin::CreateRequest(const drogon::HttpClientPtr& client) const
 {
     return HttpRequest::newHttpRequest();
@@ -1068,6 +1090,10 @@ Json::Value src_juejin::ParseData(const HttpResponsePtr& pResp) const
     }
 
     return finalResp;
+}
+
+void src_kuaishou::SetParameter(const std::string& subtype)
+{
 }
 
 HttpRequestPtr src_kuaishou::CreateRequest(const drogon::HttpClientPtr& client) const
@@ -1146,6 +1172,10 @@ Json::Value src_kuaishou::ParseData(const HttpResponsePtr& pResp) const
     return finalResp;
 }
 
+void src_netease::SetParameter(const std::string& subtype)
+{
+}
+
 HttpRequestPtr src_netease::CreateRequest(const drogon::HttpClientPtr& client) const
 {
     return HttpRequest::newHttpRequest();
@@ -1194,27 +1224,15 @@ Json::Value src_netease::ParseData(const HttpResponsePtr& pResp) const
     return finalResp;
 }
 
+void src_netease_music::SetParameter(const std::string& subtype)
+{
+    m_parameter = subtype;
+}
+
 HttpRequestPtr src_netease_music::CreateRequest(const drogon::HttpClientPtr& client) const
 {
     client->setUserAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36 Edg/114.0.1823.67");
     return HttpRequest::newHttpRequest();
-}
-
-std::string src_netease_music::srcURL() const
-{
-    std::string key = className();
-    if (key.find("src_") == 0)
-        key = key.substr(4);
-
-    std::string url;
-    if (WebCrawler::s_allNewsSrc.find(key) != WebCrawler::s_allNewsSrc.end() &&
-        WebCrawler::s_allNewsSrc.at(key).isMember("src_url"))
-    {
-        url = WebCrawler::s_allNewsSrc.at(key)["src_url"].asString();
-        url.replace(url.find(m_paraMark), m_paraMark.length(), m_parameter);
-    }
-
-    return url;
 }
 
 Json::Value src_netease_music::ParseData(const HttpResponsePtr& pResp) const
@@ -1291,6 +1309,10 @@ Json::Value src_netease_music::ParseData(const HttpResponsePtr& pResp) const
     return finalResp;
 }
 
+void src_newsqq::SetParameter(const std::string& subtype)
+{
+}
+
 HttpRequestPtr src_newsqq::CreateRequest(const drogon::HttpClientPtr& client) const
 {
     return HttpRequest::newHttpRequest();
@@ -1334,27 +1356,15 @@ Json::Value src_newsqq::ParseData(const HttpResponsePtr& pResp) const
     return finalResp;
 }
 
+void src_qq_music::SetParameter(const std::string& subtype)
+{
+    m_parameter = subtype;
+}
+
 HttpRequestPtr src_qq_music::CreateRequest(const drogon::HttpClientPtr& client) const
 {
     client->setUserAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36 Edg/114.0.1823.67");
     return HttpRequest::newHttpRequest();
-}
-
-std::string src_qq_music::srcURL() const
-{
-    std::string key = className();
-    if (key.find("src_") == 0)
-        key = key.substr(4);
-
-    std::string url;
-    if (WebCrawler::s_allNewsSrc.find(key) != WebCrawler::s_allNewsSrc.end() &&
-        WebCrawler::s_allNewsSrc.at(key).isMember("src_url"))
-    {
-        url = WebCrawler::s_allNewsSrc.at(key)["src_url"].asString();
-        url.replace(url.find(m_paraMark), m_paraMark.length(), m_parameter);
-    }
-
-    return url;
 }
 
 Json::Value src_qq_music::ParseData(const HttpResponsePtr& pResp) const
@@ -1433,6 +1443,10 @@ Json::Value src_qq_music::ParseData(const HttpResponsePtr& pResp) const
     return finalResp;
 }
 
+void src_rustcc::SetParameter(const std::string& subtype)
+{
+}
+
 HttpRequestPtr src_rustcc::CreateRequest(const drogon::HttpClientPtr& client) const
 {
     return HttpRequest::newHttpRequest();
@@ -1495,29 +1509,16 @@ Json::Value src_rustcc::ParseData(const HttpResponsePtr& pResp) const
     return finalResp;
 }
 
+void src_sina::SetParameter(const std::string& subtype)
+{
+    bool local = (trantor::Date::now().microSecondsSinceEpoch() % 2 == 0);
+    m_parameter = (local ? "news_china_suda" : "news_world_suda");
+}
+
 HttpRequestPtr src_sina::CreateRequest(const drogon::HttpClientPtr& client) const
 {
     client->setUserAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36 Edg/114.0.1823.67");
     return HttpRequest::newHttpRequest();
-}
-
-std::string src_sina::srcURL() const
-{
-    bool local = (trantor::Date::now().microSecondsSinceEpoch() % 2 == 0);
-    const std::string typeStr = (local ? "news_china_suda" : "news_world_suda");
-    std::string key = className();
-    if (key.find("src_") == 0)
-        key = key.substr(4);
-
-    std::string url;
-    if (WebCrawler::s_allNewsSrc.find(key) != WebCrawler::s_allNewsSrc.end() &&
-        WebCrawler::s_allNewsSrc.at(key).isMember("src_url"))
-    {
-        url = WebCrawler::s_allNewsSrc.at(key)["src_url"].asString();
-        url.replace(url.find(m_paraMark), m_paraMark.length(), typeStr);
-    }
-
-    return url;
 }
 
 Json::Value src_sina::ParseData(const HttpResponsePtr& pResp) const
@@ -1590,6 +1591,10 @@ Json::Value src_sina::ParseData(const HttpResponsePtr& pResp) const
     return finalResp;
 }
 
+void src_smth::SetParameter(const std::string& subtype)
+{
+}
+
 HttpRequestPtr src_smth::CreateRequest(const drogon::HttpClientPtr& client) const
 {
     return HttpRequest::newHttpRequest();
@@ -1650,6 +1655,10 @@ Json::Value src_smth::ParseData(const HttpResponsePtr& pResp) const
     return finalResp;
 }
 
+void src_sspai::SetParameter(const std::string& subtype)
+{
+}
+
 HttpRequestPtr src_sspai::CreateRequest(const drogon::HttpClientPtr& client) const
 {
     return HttpRequest::newHttpRequest();
@@ -1689,6 +1698,10 @@ Json::Value src_sspai::ParseData(const HttpResponsePtr& pResp) const
     }
 
     return finalResp;
+}
+
+void src_solidot::SetParameter(const std::string& subtype)
+{
 }
 
 HttpRequestPtr src_solidot::CreateRequest(const drogon::HttpClientPtr& client) const
@@ -1753,6 +1766,10 @@ Json::Value src_solidot::ParseData(const HttpResponsePtr& pResp) const
     return finalResp;
 }
 
+void src_thepaper::SetParameter(const std::string& subtype)
+{
+}
+
 HttpRequestPtr src_thepaper::CreateRequest(const drogon::HttpClientPtr& client) const
 {
     return HttpRequest::newHttpRequest();
@@ -1794,6 +1811,10 @@ Json::Value src_thepaper::ParseData(const HttpResponsePtr& pResp) const
     return finalResp;
 }
 
+void src_tieba::SetParameter(const std::string& subtype)
+{
+}
+
 HttpRequestPtr src_tieba::CreateRequest(const drogon::HttpClientPtr& client) const
 {
     return HttpRequest::newHttpRequest();
@@ -1829,6 +1850,10 @@ Json::Value src_tieba::ParseData(const HttpResponsePtr& pResp) const
     }
 
     return finalResp;
+}
+
+void src_toutiao::SetParameter(const std::string& subtype)
+{
 }
 
 HttpRequestPtr src_toutiao::CreateRequest(const drogon::HttpClientPtr& client) const
@@ -1869,6 +1894,10 @@ Json::Value src_toutiao::ParseData(const HttpResponsePtr& pResp) const
     }
 
     return finalResp;
+}
+
+void src_v2ex::SetParameter(const std::string& subtype)
+{
 }
 
 HttpRequestPtr src_v2ex::CreateRequest(const drogon::HttpClientPtr& client) const
@@ -1922,6 +1951,10 @@ Json::Value src_v2ex::ParseData(const HttpResponsePtr& pResp) const
     return finalResp;
 }
 
+void src_weibo::SetParameter(const std::string& subtype)
+{
+}
+
 HttpRequestPtr src_weibo::CreateRequest(const drogon::HttpClientPtr& client) const
 {
     client->setUserAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36 Edg/114.0.1823.67");
@@ -1967,6 +2000,10 @@ Json::Value src_weibo::ParseData(const HttpResponsePtr& pResp) const
     return finalResp;
 }
 
+void src_weread::SetParameter(const std::string& subtype)
+{
+}
+
 HttpRequestPtr src_weread::CreateRequest(const drogon::HttpClientPtr& client) const
 {
     client->setUserAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36 Edg/114.0.1823.67");
@@ -2008,6 +2045,10 @@ Json::Value src_weread::ParseData(const HttpResponsePtr& pResp) const
     }
 
     return finalResp;
+}
+
+void src_zhihu::SetParameter(const std::string& subtype)
+{
 }
 
 HttpRequestPtr src_zhihu::CreateRequest(const drogon::HttpClientPtr& client) const

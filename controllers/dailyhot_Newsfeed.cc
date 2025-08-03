@@ -178,17 +178,8 @@ Task<> Newsfeed::Calendar(HttpRequestPtr req,
     }
     else
     {
-        pSource->m_parameter.clear();
+        pSource->SetParameter(month);
         std::string req_path = pSource->srcURL();
-        size_t finalPos = req_path.find_last_of('/');
-        std::string url;
-        if (finalPos != std::string::npos)
-        {
-            url = req_path.substr(0, finalPos + 1);
-            url += month;
-            req_path = url + ".json";
-        }
-        url = req_path;
         auto client = CreateHttpClient(req_path);
         
         try
@@ -200,7 +191,7 @@ Task<> Newsfeed::Calendar(HttpRequestPtr req,
 
             if (resp->getStatusCode() == k200OK)
             {
-                pSource->m_parameter = month + day;
+                pSource->SetParameter(month + day);
                 content = pSource->ParseData(resp);
                 if (content["code"].isNull())
                 {
@@ -252,13 +243,13 @@ Task<Json::Value> Newsfeed::FetchNewData(const std::string &src, const std::stri
         co_return respData;
     }
 
-    news_src->m_parameter = type;
+    news_src->SetParameter(type);
     std::string req_path = news_src->srcURL();
     std::string key = src;
     std::string val_str;
 LOG_INFO << "URL: " << req_path;
     auto client = CreateHttpClient(req_path);
-    
+
     try
     {
         auto req = news_src->CreateRequest(client);

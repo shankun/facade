@@ -2,29 +2,21 @@
 
 #include "web_crawler.h"
 
-#define REGISTERFEEDCLASSU(className) \
-class src_##className : public dailyhot::FeedObject<src_##className>, public WebCrawler { \
-public: \
-	src_##className() {} \
-    virtual drogon::HttpRequestPtr CreateRequest(const drogon::HttpClientPtr& client) const override; \
-	virtual std::string srcURL() const override; \
-	virtual Json::Value ParseData(const drogon::HttpResponsePtr& pResp) const override; \
-};
-
 #define REGISTERFEEDCLASS(className) \
 class src_##className : public dailyhot::FeedObject<src_##className>, public WebCrawler { \
 public: \
 	src_##className() {} \
     virtual drogon::HttpRequestPtr CreateRequest(const drogon::HttpClientPtr& client) const override; \
 	virtual Json::Value ParseData(const drogon::HttpResponsePtr& pResp) const override; \
+	void SetParameter(const std::string& subtype); \
 };
 
 REGISTERFEEDCLASS(36kr)
 REGISTERFEEDCLASS(baidu)
-REGISTERFEEDCLASSU(bestblogs)
+REGISTERFEEDCLASS(bestblogs)
 REGISTERFEEDCLASS(bilibili)
-REGISTERFEEDCLASSU(calendar)
-REGISTERFEEDCLASSU(ckxx)
+REGISTERFEEDCLASS(calendar)
+REGISTERFEEDCLASS(ckxx)
 REGISTERFEEDCLASS(douban)
 REGISTERFEEDCLASS(douban_group)
 REGISTERFEEDCLASS(douyin)
@@ -38,11 +30,11 @@ REGISTERFEEDCLASS(jianshu)
 REGISTERFEEDCLASS(juejin)
 REGISTERFEEDCLASS(kuaishou)
 REGISTERFEEDCLASS(netease)
-REGISTERFEEDCLASSU(netease_music)
+REGISTERFEEDCLASS(netease_music)
 REGISTERFEEDCLASS(newsqq)
-REGISTERFEEDCLASSU(qq_music)
+REGISTERFEEDCLASS(qq_music)
 REGISTERFEEDCLASS(rustcc)
-REGISTERFEEDCLASSU(sina)
+REGISTERFEEDCLASS(sina)
 REGISTERFEEDCLASS(smth)
 REGISTERFEEDCLASS(solidot)
 REGISTERFEEDCLASS(sspai)

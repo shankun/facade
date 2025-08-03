@@ -166,6 +166,9 @@ std::string WebCrawler::srcURL() const
         s_allNewsSrc.at(key).isMember("src_url"))
     {
         url = s_allNewsSrc.at(key)["src_url"].asString();
+        size_t pos = url.find(m_paraMark);
+        if ((pos != url.npos) && !m_parameter.empty())
+            url.replace(pos, m_paraMark.length(), m_parameter);
     }
  
     return url;
