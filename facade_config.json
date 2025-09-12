@@ -4,8 +4,8 @@
     //ssl:The global SSL settings. "key" and "cert" are the path to the SSL key and certificate. While
     //    "conf" is an array of 1 or 2-element tuples that supplies file style options for `SSL_CONF_cmd`.
     "ssl": {
-        "cert": "/etc/nginx/ssl/shankun.tech.pem",
-        "key": "/etc/nginx/ssl/shankun.tech.key",
+        "cert": "/etc/nginx/ssl/shankun.eu.cc.pem",
+        "key": "/etc/nginx/ssl/shankun.eu.cc.key",
         "conf": [
             ["Options", "-SessionTicket"], 
             ["Options", "Compression"]
@@ -622,7 +622,7 @@
                 "class": "jianshu",
                 "name": "简书",
                 "title": "后端开发技术",
-                "src_url": "https://www.jianshu.com/programmers?page=1&type_id=27&count=20"
+                "src_url": "http://hc.hongye.com.cn:8083/hcitydata/dbs/jianshu.json"
             },
             {
                 "class": "juejin",
