@@ -11,10 +11,16 @@ Due to connection delays from abroad, a scheduled task was assigned to run fetch
 * https://www.kuaishou.com/brilliant
 at intervals.
 
+## Build
+```   
+   cd build
+   cmake .. -DCMAKE_BUILD_TYPE=Release
+   cmake --build . --parallel 4
+```
 
 The gcc compiler support c++20 is needed to build this project.
 
-Dependencies:
+## Dependencies:
 1. [tree-sitter](https://github.com/tree-sitter/tree-sitter)
 2. [tree-sitter-html](https://github.com/tree-sitter/tree-sitter-html)
 3. [Beautiful-Soup-CPP](https://github.com/shankun/Beautiful-Soup-CPP)  to parse HTML document.
