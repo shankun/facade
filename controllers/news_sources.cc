@@ -1920,7 +1920,7 @@ Json::Value src_v2ex::ParseData(const HttpResponsePtr& pResp) const
     std::string strVal;
     std::string resp_str{pResp->body()};
     std::replace(resp_str.begin(), resp_str.end(), '\n',' ');
-    const std::string prefix("https://gh.shankun.eu.cc/https://v2ex.com");
+    const std::string prefix("https://gh.shankun.me/https://v2ex.com");
     try
     {
         BeautifulSoup parser(resp_str);
