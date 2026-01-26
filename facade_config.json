@@ -4,61 +4,103 @@
     //ssl:The global SSL settings. "key" and "cert" are the path to the SSL key and certificate. While
     //    "conf" is an array of 1 or 2-element tuples that supplies file style options for `SSL_CONF_cmd`.
     "ssl": {
-        "cert": "/etc/nginx/ssl/shankun.eu.cc.pem",
-        "key": "/etc/nginx/ssl/shankun.eu.cc.key",
+        "cert": "/etc/nginx/ssl/shankun.me.pem",
+        "key": "/etc/nginx/ssl/shankun.me.key",
         "conf": [
-            ["Options", "-SessionTicket"], 
+            ["Options", "-SessionTicket"],
             ["Options", "Compression"]
-       ]
+        ]
     },
     // mime: A dictionary that extends the internal MIME type support. Maps extensions into new MIME types
     // note: This option only adds MIME to the sever. `file_types` above have to be set for the server to serve them.
-  "mime": {
-    "text/markdown": "md",
-    // "text/gemini": ["gmi", "gemini"]
-    "text/less": "less",
-    "text/plain": [ "glsl", "pack", "svf", "pf", "txt", "cpp", "h", "m3u", "bat"],
-    "text/html": "htm",
-    "application/wasm": "wasm",
-    "application/x-font-ttf": "ttf",
-    "application/font-woff": "woff",
-    "application/font-woff2": "woff2",
-    "application/vnd.google-earth.kml+xml": "kml",
-    "application/vnd.google-earth.kmz": "kmz",
-    "image/svg+xml": "svg",
-    "image/ktx": "ktx",
-    "image/crn": "crn",
-    "text/xml": "xml",
-    "text/yaml": "yaml",
-    "image/gif": "gif",
-    "image/x-ms-bmp": "bmp",
-    "image/png": "png",
-    "image/webp": "webp",
-    "image/x-icon": "ico",
-    "image/tiff": [ "tif", "tiff" ],
-    "image/jpeg": [ "jpg", "jpeg" ],
-    "video/mp4": "mp4",
-    "audio/x-mpeg": "mp3",
-    "audio/flac": "flac",
-    "audio/ape": "ape",
-    "application/json": [ "json", "geojson", "topojson", "czml" ],
-    "application/pdf": "pdf",
-    "application/msword": [ "doc", "docx" ],
-    "application/java-archive": [ "jar", "war", "ear" ],
-    "model/gltf+json": [ "bltf", "gltf" ],
-    "model/gltf-binary": [ "bgltf", "glb" ],
-    "application/vnd.quantized-mesh": "terrain",
-    "application/octet-stream": [ "ppt", "pptx", "xls", "xlsx", "epub", "mobi", "dds", "b3dm", "i3dm", "cmpt", "pnts", "7z", "zip", "dat", "bin", "gz", "exe", "dll", "iso", "msi", "msp", "msm", "msu", "mdb", "fdb", "max", "rvt", "dmp", "him", "zst" , "tar" ]
-  },
+    "mime": {
+        "text/markdown": "md",
+        // "text/gemini": ["gmi", "gemini"]
+        "text/less": "less",
+        "text/plain": [
+            "glsl",
+            "pack",
+            "svf",
+            "pf",
+            "txt",
+            "cpp",
+            "h",
+            "m3u",
+            "bat"
+        ],
+        "text/html": "htm",
+        "application/wasm": "wasm",
+        "application/x-font-ttf": "ttf",
+        "application/font-woff": "woff",
+        "application/font-woff2": "woff2",
+        "application/vnd.google-earth.kml+xml": "kml",
+        "application/vnd.google-earth.kmz": "kmz",
+        "image/svg+xml": "svg",
+        "image/ktx": "ktx",
+        "image/crn": "crn",
+        "text/xml": "xml",
+        "text/yaml": "yaml",
+        "image/gif": "gif",
+        "image/x-ms-bmp": "bmp",
+        "image/png": "png",
+        "image/webp": "webp",
+        "image/x-icon": "ico",
+        "image/tiff": ["tif", "tiff"],
+        "image/jpeg": ["jpg", "jpeg"],
+        "video/mp4": "mp4",
+        "audio/x-mpeg": "mp3",
+        "audio/flac": "flac",
+        "audio/ape": "ape",
+        "application/json": ["json", "geojson", "topojson", "czml"],
+        "application/pdf": "pdf",
+        "application/msword": ["doc", "docx"],
+        "application/java-archive": ["jar", "war", "ear"],
+        "model/gltf+json": ["bltf", "gltf"],
+        "model/gltf-binary": ["bgltf", "glb"],
+        "application/vnd.quantized-mesh": "terrain",
+        "application/octet-stream": [
+            "ppt",
+            "pptx",
+            "xls",
+            "xlsx",
+            "epub",
+            "mobi",
+            "dds",
+            "b3dm",
+            "i3dm",
+            "cmpt",
+            "pnts",
+            "7z",
+            "zip",
+            "dat",
+            "bin",
+            "gz",
+            "exe",
+            "dll",
+            "iso",
+            "msi",
+            "msp",
+            "msm",
+            "msu",
+            "mdb",
+            "fdb",
+            "max",
+            "rvt",
+            "dmp",
+            "him",
+            "zst",
+            "tar"
+        ]
+    },
     "listeners": [
-//        {
-            //address: Ip address,0.0.0.0 by default
-//            "address": "0.0.0.0",
-            //port: Port number
-//            "port": 80,
-//            //https: If true, use https for security,false by default
-//            "https": false
-//        }
+        //        {
+        //address: Ip address,0.0.0.0 by default
+        //            "address": "0.0.0.0",
+        //port: Port number
+        //            "port": 80,
+        //            //https: If true, use https for security,false by default
+        //            "https": false
+        //        }
         {
             "address": "0.0.0.0",
             "port": 443,
@@ -69,13 +111,11 @@
             "key": "",
             //use_old_tls: enable the TLS1.0/1.1, false by default
             "use_old_tls": false,
-            "ssl_conf": [
-                ["MinProtocol", "TLSv1.2"]
-            ]
+            "ssl_conf": [["MinProtocol", "TLSv1.2"]]
         }
     ],
 
-/*    "db_clients": [
+    /*    "db_clients": [
         {
             //name: Name of the client,'default' by default
             //"name":"",
@@ -96,11 +136,11 @@
             //is_fast: false by default, if it is true, the client is faster but user can't call
             //any synchronous interface of it.
             "is_fast": false,
-            //client_encoding: The character set used by the client. it is empty string by default which 
+            //client_encoding: The character set used by the client. it is empty string by default which
             //means use the default character set.
             //"client_encoding": "",
-            //number_of_connections: 1 by default, if the 'is_fast' is true, the number is the number of  
-            //connections per IO thread, otherwise it is the total number of all connections.  
+            //number_of_connections: 1 by default, if the 'is_fast' is true, the number is the number of
+            //connections per IO thread, otherwise it is the total number of all connections.
             "number_of_connections": 1,
             //timeout: -1.0 by default, in seconds, the timeout for executing a SQL query.
             //zero or negative value means no timeout.
@@ -113,7 +153,7 @@
     "redis_clients": [
         {
             //name: Name of the client,'default' by default
-            "name":"dailyhotcache",
+            "name": "dailyhotcache",
             //host: Server IP, 127.0.0.1 by default
             "host": "127.0.0.1",
             //port: Server port, 6379 by default
@@ -127,8 +167,8 @@
             //is_fast: false by default, if it is true, the client is faster but user can't call
             //any synchronous interface of it.
             "is_fast": true,
-            //number_of_connections: 1 by default, if the 'is_fast' is true, the number is the number of  
-            //connections per IO thread, otherwise it is the total number of all connections.  
+            //number_of_connections: 1 by default, if the 'is_fast' is true, the number is the number of
+            //connections per IO thread, otherwise it is the total number of all connections.
             "number_of_connections": 1,
             //timeout: -1.0 by default, in seconds, the timeout for executing a command.
             //zero or negative value means no timeout.
@@ -145,7 +185,7 @@
         "session_timeout": 0,
         //string value of SameSite attribute of the Set-Cookie HTTP respone header
         //valid value is either 'Null' (default), 'Lax', 'Strict' or 'None'
-        "session_same_site" : "Null",
+        "session_same_site": "Null",
         //session_cookie_key: The cookie key of the session, "JSESSIONID" by default
         "session_cookie_key": "JSESSIONID",
         //session_max_age: The max age of the session cookie, -1 by default
@@ -162,7 +202,7 @@
         //For example, by default, http://localhost/a-directory resolves to http://localhost/a-directory/index.html.
         "implicit_page": "index.html",
         //static_file_headers: Headers for static files
-/*
+        /*
           "static_file_headers": [
           {
                 "name": "field-name",
@@ -170,7 +210,7 @@
           }
         ],
 */
-        //upload_path: The path to save the uploaded file. "uploads" by default. 
+        //upload_path: The path to save the uploaded file. "uploads" by default.
         //If the path isn't prefixed with /, ./ or ../,
         //it is relative path of document_root path
         "upload_path": "depot",
@@ -179,85 +219,85 @@
         // by default are "html", "js", "css", "xml", "xsl", "txt", "svg",
         // "ttf", "otf", "woff2", "woff" , "eot", "png", "jpg", "jpeg",
         // "gif", "bmp", "ico", "icns", etc.
-      "file_types": [
-        "gif",
-        "doc",
-        "docx",
-        "ppt",
-        "pptx",
-        "xls",
-        "xlsx",
-        "epub",
-        "mobi",
-        "pdf",
-        "png",
-        "jpg",
-        "js",
-        "json",
-        "css",
-        "html",
-        "ico",
-        "swf",
-        "xap",
-        "apk",
-        "cur",
-        "xml",
-        "mp4",
-        "mp3",
-        "msu",
-        "7z",
-        "zip",
-        "rar",
-        "exe",
-	"dll",
-        "msi",
-        "iso",
-        "txt",
-        "pf",
-        "dds",
-        "bltf",
-        "pack",
-        "pnts",
-        "svf",
-        "czml",
-        "glsl",
-        "pnts",
-        "b3dm",
-        "i3dm",
-        "cmpt",
-	"him",
-        "gltf",
-        "glb",
-        "wasm",
-        "woff2",
-        "woff",
-        "kml",
-        "kmz",
-        "terrain",
-        "ktx",
-        "crn",
-        "flac",
-        "ape",
-        "bin",
-        "dat",
-        "gz",
-        "zst",
-        "cpp",
-        "bat",
-        "h",
-	"mdb",
-	"fdb",
-	"rvt",
-	"max",
-	"dmp",
-	"m3u",
-        "webp",
-        "svg",
-        "tar",
-	"obj",
-	"fshader",
-	"vshader"
-      ],
+        "file_types": [
+            "gif",
+            "doc",
+            "docx",
+            "ppt",
+            "pptx",
+            "xls",
+            "xlsx",
+            "epub",
+            "mobi",
+            "pdf",
+            "png",
+            "jpg",
+            "js",
+            "json",
+            "css",
+            "html",
+            "ico",
+            "swf",
+            "xap",
+            "apk",
+            "cur",
+            "xml",
+            "mp4",
+            "mp3",
+            "msu",
+            "7z",
+            "zip",
+            "rar",
+            "exe",
+            "dll",
+            "msi",
+            "iso",
+            "txt",
+            "pf",
+            "dds",
+            "bltf",
+            "pack",
+            "pnts",
+            "svf",
+            "czml",
+            "glsl",
+            "pnts",
+            "b3dm",
+            "i3dm",
+            "cmpt",
+            "him",
+            "gltf",
+            "glb",
+            "wasm",
+            "woff2",
+            "woff",
+            "kml",
+            "kmz",
+            "terrain",
+            "ktx",
+            "crn",
+            "flac",
+            "ape",
+            "bin",
+            "dat",
+            "gz",
+            "zst",
+            "cpp",
+            "bat",
+            "h",
+            "mdb",
+            "fdb",
+            "rvt",
+            "max",
+            "dmp",
+            "m3u",
+            "webp",
+            "svg",
+            "tar",
+            "obj",
+            "fshader",
+            "vshader"
+        ],
         //locations: An array of locations of static files for GET requests.
         "locations": [
             {
@@ -266,9 +306,9 @@
                 //default_content_type: The default content type of the static files without
                 //an extension. empty string by default.
                 "default_content_type": "text/plain",
-                //alias: The location in file system, if it is prefixed with "/", it 
-                //presents an absolute path, otherwise it presents a relative path to 
-                //the document_root path. 
+                //alias: The location in file system, if it is prefixed with "/", it
+                //presents an absolute path, otherwise it presents a relative path to
+                //the document_root path.
                 //The default value is "" which means use the document root path as the location base path.
                 "alias": "/srv/http/static/microblogs",
                 //is_case_sensitive: indicates whether the URI prefix is case sensitive.
@@ -324,6 +364,15 @@
                 "allow_all": true,
                 "is_recursive": true,
                 "filters": []
+            },
+            {
+                "uri_prefix": "/mammalia-tree",
+                "default_content_type": "text/html",
+                "alias": "/srv/http/static/mammalia-tree",
+                "is_case_sensitive": false,
+                "allow_all": true,
+                "is_recursive": true,
+                "filters": []
             }
         ],
         //max_connections: maximum number of connections, 100000 by default
@@ -336,23 +385,21 @@
         "load_dynamic_views": false,
         //dynamic_views_path: If the path isn't prefixed with /, ./ or ../,
         //it is relative path of document_root path
-        "dynamic_views_path": [
-            "./views"
-        ],
-        //dynamic_views_output_path: Default by an empty string which means the output path of source 
-        //files is the path where the csp files locate. If the path isn't prefixed with /, it is relative 
+        "dynamic_views_path": ["./views"],
+        //dynamic_views_output_path: Default by an empty string which means the output path of source
+        //files is the path where the csp files locate. If the path isn't prefixed with /, it is relative
         //path of the current working directory.
         "dynamic_views_output_path": "",
         //json_parser_stack_limit: 1000 by default, the maximum number of stack depth when reading a json string by the jsoncpp library.
         "json_parser_stack_limit": 1000,
         //enable_unicode_escaping_in_json: true by default, enable unicode escaping in json.
         "enable_unicode_escaping_in_json": true,
-        //float_precision_in_json: set precision of float number in json. 
+        //float_precision_in_json: set precision of float number in json.
         "float_precision_in_json": {
-            //precision: 0 by default, 0 means use the default precision of the jsoncpp lib. 
+            //precision: 0 by default, 0 means use the default precision of the jsoncpp lib.
             "precision": 0,
-            //precision_type: must be "significant" or "decimal", defaults to "significant" that means 
-            //setting max number of significant digits in string, "decimal" means setting max number of 
+            //precision_type: must be "significant" or "decimal", defaults to "significant" that means
+            //setting max number of significant digits in string, "decimal" means setting max number of
             //digits after "." in string
             "precision_type": "significant"
         },
@@ -371,7 +418,7 @@
             "log_size_limit": 100000000,
             //max_files: 0 by default,
             //When the number of old log files exceeds "max_files", the oldest file will be deleted. 0 means never delete.
-            "max_files": 0, 
+            "max_files": 0,
             //log_level: "DEBUG" by default,options:"TRACE","DEBUG","INFO","WARN"
             //The TRACE level is only valid when built in DEBUG mode.
             "log_level": "DEBUG",
@@ -384,7 +431,7 @@
         "handle_sig_term": true,
         //relaunch_on_error: False by default, if true, the program will be restart by the parent after exiting;
         "relaunch_on_error": false,
-        //use_sendfile: True by default, if true, the program 
+        //use_sendfile: True by default, if true, the program
         //uses sendfile() system-call to send static files to clients;
         "use_sendfile": true,
         //use_gzip: True by default, use gzip to compress the response body's content;
@@ -395,7 +442,7 @@
         //0 means cache forever, the negative value means no cache
         "static_files_cache_time": 5,
         //simple_controllers_map: Used to configure mapping from path to simple controller
-/*
+        /*
         "simple_controllers_map": [
             {
                 "path": "/path/name",
@@ -410,31 +457,31 @@
             }
         ],
 */
-        //idle_connection_timeout: Defaults to 60 seconds, the lifetime 
+        //idle_connection_timeout: Defaults to 60 seconds, the lifetime
         //of the connection without read or write
         "idle_connection_timeout": 60,
         //server_header_field: Set the 'Server' header field in each response sent by drogon,
         //empty string by default with which the 'Server' header field is set to "Server: drogon/version string\r\n"
         "server_header_field": "",
-        //enable_server_header: Set true to force drogon to add a 'Server' header to each HTTP response. The default 
+        //enable_server_header: Set true to force drogon to add a 'Server' header to each HTTP response. The default
         //value is true.
         "enable_server_header": true,
-        //enable_date_header: Set true to force drogon to add a 'Date' header to each HTTP response. The default 
+        //enable_date_header: Set true to force drogon to add a 'Date' header to each HTTP response. The default
         //value is true.
         "enable_date_header": true,
-        //keepalive_requests: Set the maximum number of requests that can be served through one keep-alive connection. 
+        //keepalive_requests: Set the maximum number of requests that can be served through one keep-alive connection.
         //After the maximum number of requests are made, the connection is closed.
         //The default value of 0 means no limit.
         "keepalive_requests": 0,
-        //pipelining_requests: Set the maximum number of unhandled requests that can be cached in pipelining buffer. 
+        //pipelining_requests: Set the maximum number of unhandled requests that can be cached in pipelining buffer.
         //After the maximum number of requests are made, the connection is closed.
         //The default value of 0 means no limit.
         "pipelining_requests": 0,
-        //gzip_static: If it is set to true, when the client requests a static file, drogon first finds the compressed 
+        //gzip_static: If it is set to true, when the client requests a static file, drogon first finds the compressed
         //file with the extension ".gz" in the same path and send the compressed file to the client.
         //The default value of gzip_static is true.
         "gzip_static": true,
-        //br_static: If it is set to true, when the client requests a static file, drogon first finds the compressed 
+        //br_static: If it is set to true, when the client requests a static file, drogon first finds the compressed
         //file with the extension ".br" in the same path and send the compressed file to the client.
         //The default value of br_static is true.
         "br_static": true,
@@ -477,7 +524,10 @@
                         "key": "jinrishici",
                         "name": "今日诗词",
                         "url": "https://v2.jinrishici.com/sentence",
-                        "headers": ["X-User-Token", "RgU1rBKtLym/MhhYIXs42WNoqLyZeXY3EkAcDNrcfKkzj8ILIsAP1Hx0NGhdOO1I"]
+                        "headers": [
+                            "X-User-Token",
+                            "RgU1rBKtLym/MhhYIXs42WNoqLyZeXY3EkAcDNrcfKkzj8ILIsAP1Hx0NGhdOO1I"
+                        ]
                     }
                 ]
             }
@@ -490,9 +540,7 @@
             //config: The configuration of the plugin. This json object is the parameter to initialize the plugin.
             //It can be commented out
             "config": {
-                "ssl_redirect_exempt": [
-                    ".*\\.jpg"
-                ],
+                "ssl_redirect_exempt": [".*\\.jpg"],
                 "secure_ssl_host": "localhost:8849"
             }
         },
@@ -500,20 +548,20 @@
             "name": "drogon::plugin::AccessLogger",
             "dependencies": [],
             "config": {
-                    "use_spdlog": true,
-                    "log_path": "",
-                    "log_format": "",
-                    "log_file": "access.log",
-                    "log_size_limit": 0,
-                    "use_local_time": true,
-                    "log_index": 0
-                    // "show_microseconds": true,
-                    // "custom_time_format": "",
-                    // "use_real_ip": false
+                "use_spdlog": true,
+                "log_path": "",
+                "log_format": "",
+                "log_file": "access.log",
+                "log_size_limit": 0,
+                "use_local_time": true,
+                "log_index": 0
+                // "show_microseconds": true,
+                // "custom_time_format": "",
+                // "use_real_ip": false
             }
         }
     ],
-    //custom_config: custom configuration for users. This object can be get by the app().getCustomConfig() method. 
+    //custom_config: custom configuration for users. This object can be get by the app().getCustomConfig() method.
     "custom_config": {
         "hitokoto_storage": "/srv/http/dynamic/data/hitokoto/",
         "realm": "drogonRealm",
@@ -561,8 +609,18 @@
                 "name": "参考消息",
                 "title": "频道",
                 "src_url": "https://china.cankaoxiaoxi.com/json/channel/{parameter}/list.json",
-                "categories": ["zhongguo", "gj", "guandian", "ruick", "tiyujk", "kejiyy", "wenhualy", 
-                  "cankaomt", "cankaozk", "junshi"]
+                "categories": [
+                    "zhongguo",
+                    "gj",
+                    "guandian",
+                    "ruick",
+                    "tiyujk",
+                    "kejiyy",
+                    "wenhualy",
+                    "cankaomt",
+                    "cankaozk",
+                    "junshi"
+                ]
             },
             {
                 "class": "douban",
@@ -647,9 +705,12 @@
                 "name": "网易云音乐",
                 "title": "排行榜",
                 "src_url": "https://music.163.com/discover/toplist?id={parameter}",
-                "categories": [ { "19723756": "飙升榜" }, 
-                    { "3779629": "新歌榜" }, { "2884035": "原创榜" }, 
-                    { "3778678": "热歌榜" }]
+                "categories": [
+                    { "19723756": "飙升榜" },
+                    { "3779629": "新歌榜" },
+                    { "2884035": "原创榜" },
+                    { "3778678": "热歌榜" }
+                ]
             },
             {
                 "class": "newsqq",
@@ -662,8 +723,14 @@
                 "name": "QQ音乐",
                 "title": "排行榜",
                 "src_url": "https://c.y.qq.com/v8/fcg-bin/fcg_v8_toplist_cp.fcg?topid={parameter}&platform=yqq.json&jsonpCallback=MusicJsonCallbacktoplist",
-                "categories": [ {"62":"飙升榜"}, {"26":"热歌榜"}, {"27":"新歌榜"},
-                    {"4":"流行指数榜"}, {"52":"腾讯音乐人原创榜"}, {"67":"听歌识曲榜"}]
+                "categories": [
+                    { "62": "飙升榜" },
+                    { "26": "热歌榜" },
+                    { "27": "新歌榜" },
+                    { "4": "流行指数榜" },
+                    { "52": "腾讯音乐人原创榜" },
+                    { "67": "听歌识曲榜" }
+                ]
             },
             {
                 "class": "rustcc",
