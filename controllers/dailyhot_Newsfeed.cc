@@ -9,7 +9,7 @@ using namespace dailyhot;
 
 Newsfeed::Newsfeed()
 {
-    if (WebCrawler::s_allNewsSrc.empty())
+    if (WebCrawler::s_allNewsSrc.empty() && app().getCustomConfig().isMember("feed_src"))
     {
         const Json::Value& srcList = app().getCustomConfig()["feed_src"];
         if (srcList.isArray() && !srcList.empty())
@@ -25,7 +25,7 @@ Newsfeed::Newsfeed()
     }
 }
 
-Task<> Newsfeed::GetHotList(HttpRequestPtr req, 
+Task<> Newsfeed::GetHotList(HttpRequestPtr req,
                             std::function<void (const HttpResponsePtr &)> callback,
                             std::string source, dailyhot::Parameter param) const
 {
@@ -38,7 +38,7 @@ Task<> Newsfeed::GetHotList(HttpRequestPtr req,
         content["name"] = "全部接口";
         content["subtitle"] = "除了特殊接口外的全部接口列表";
         content["total"] = WebCrawler::s_allNewsSrc.size();
-        
+
         for (const auto& [k, v] : WebCrawler::s_allNewsSrc)
         {
             Json::Value item;
@@ -76,7 +76,7 @@ Task<> Newsfeed::GetHotList(HttpRequestPtr req,
         callback(resp);
         co_return;
     }
-    
+
     std::string type_str = GetTypeId(source, param.typeVal);
     bool applicable = false;
     nosql::RedisClientPtr redisPtr = app().getFastRedisClient(WebCrawler::s_dbName);
@@ -88,7 +88,7 @@ Task<> Newsfeed::GetHotList(HttpRequestPtr req,
         callback(resp);
         co_return;
     }
-    
+
     std::string key = type_str.empty() ? source : std::format("{}:{}", source, type_str);
     auto result = co_await redisPtr->execCommandCoro("JSON.GET %s $.updateTime", key.c_str());
 
@@ -130,8 +130,8 @@ Task<> Newsfeed::GetHotList(HttpRequestPtr req,
     callback(resp);
 }
 
-Task<> Newsfeed::UpdateHotList(HttpRequestPtr req, 
-                               std::function<void (const HttpResponsePtr &)> callback, 
+Task<> Newsfeed::UpdateHotList(HttpRequestPtr req,
+                               std::function<void (const HttpResponsePtr &)> callback,
                                std::string source) const
 {
     Json::Value content = co_await FetchNewData(source);
@@ -139,8 +139,8 @@ Task<> Newsfeed::UpdateHotList(HttpRequestPtr req,
     callback(resp);
 }
 
-Task<> Newsfeed::Calendar(HttpRequestPtr req, 
-                          std::function<void(const HttpResponsePtr &)> callback, 
+Task<> Newsfeed::Calendar(HttpRequestPtr req,
+                          std::function<void(const HttpResponsePtr &)> callback,
                           std::string month, std::string day)
 {
     Json::Value content;
@@ -168,7 +168,7 @@ Task<> Newsfeed::Calendar(HttpRequestPtr req,
         callback(response);
         co_return;
     }
-    
+
     auto pCrawler = FeedClassMap::getSingleInstance("src_calendar");
     auto pSource = std::dynamic_pointer_cast<src_calendar>(pCrawler);
     if (!pSource)
@@ -181,7 +181,7 @@ Task<> Newsfeed::Calendar(HttpRequestPtr req,
         pSource->SetParameter(month);
         std::string url = pSource->srcURL();
         auto client = CreateHttpClient(url);
-        
+
         try
         {
             auto req = pSource->CreateRequest(client);
@@ -270,7 +270,7 @@ LOG_INFO << "URL: " << req_path;
                 if (WebCrawler::s_allNewsSrc.at(src).isMember("categories"))
                 {
                     const Json::Value& categories = WebCrawler::s_allNewsSrc.at(src)["categories"];
-                    if (categories.isArray() && !categories.empty() && 
+                    if (categories.isArray() && !categories.empty() &&
                         categories.front().isObject() && !type.empty())
                     {
                         for (const auto& item : categories)
@@ -283,10 +283,10 @@ LOG_INFO << "URL: " << req_path;
                         }
                     }
                 }
-                
+
                 if (val_str.empty() && WebCrawler::s_allNewsSrc.at(src).isMember("title"))
                     val_str = WebCrawler::s_allNewsSrc.at(src)["title"].asString();
-                
+
                 respData["subtitle"] = val_str;
                 respData["source"] = src;
                 key = type.empty() ? src : std::format("{}:{}", src, type);
@@ -314,21 +314,21 @@ std::string Newsfeed::GetTypeId(const std::string& src, int type_val) const
 {
     std::string type_str;
     // 参考消息新闻频道
-    // type: 1=中国(zhongguo); 2=国际(gj); 3=观点(guandian); 4=锐参考(ruick); 
-    //       5=体育健康(tiyujk); 6=科技应用(kejiyy); 7=文化旅游(wenhualy); 
+    // type: 1=中国(zhongguo); 2=国际(gj); 3=观点(guandian); 4=锐参考(ruick);
+    //       5=体育健康(tiyujk); 6=科技应用(kejiyy); 7=文化旅游(wenhualy);
     //       8=参考漫谈(cankaomt); 9=参考智库(cankaozk); 10=军事(junshi)
 
     // 网易云音乐排行榜需要传入指定榜单类别
     // type: 1=飙升榜; 2=新歌榜; 3=原创榜; 4=热歌榜
 
     // QQ音乐排行榜需要传入指定榜单类别
-    // type: 1=飙升榜; 2=热歌榜; 3=新歌榜; 4=流行指数榜; 
+    // type: 1=飙升榜; 2=热歌榜; 3=新歌榜; 4=流行指数榜;
     //       5=腾讯音乐人原创榜; 6=听歌识曲榜
 
     // BestBlogs需要传入指定榜单类别
     // type: 1=软件编程；2=人工智能
 
-    if (WebCrawler::s_allNewsSrc.find(src) == WebCrawler::s_allNewsSrc.end() || 
+    if (WebCrawler::s_allNewsSrc.find(src) == WebCrawler::s_allNewsSrc.end() ||
         !WebCrawler::s_allNewsSrc.at(src).isMember("categories"))
     {
         return type_str;
@@ -348,7 +348,7 @@ std::string Newsfeed::GetTypeId(const std::string& src, int type_val) const
     {
         type_str = categories[type_val - 1].asString();
     }
-    
+
     return type_str;
 }
 

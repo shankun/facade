@@ -668,19 +668,19 @@
                 "class": "huxiu",
                 "name": "虎嗅",
                 "title": "最新资讯",
-                "src_url": "http://hc.hongye.com.cn:8083/hcitydata/dbs/huxiu-rss.xml"
+                "src_url": "http://hc.hongye.com.cn:8082/hcitydata/dbs/huxiu-rss.xml"
             },
             {
                 "class": "ithome",
                 "name": "IT之家",
                 "title": "热榜",
-                "src_url": "http://hc.hongye.com.cn:8083/hcitydata/dbs/ithome-rss.xml"
+                "src_url": "http://hc.hongye.com.cn:8082/hcitydata/dbs/ithome-rss.xml"
             },
             {
                 "class": "jianshu",
                 "name": "简书",
                 "title": "后端开发技术",
-                "src_url": "http://hc.hongye.com.cn:8083/hcitydata/dbs/jianshu.json"
+                "src_url": "http://hc.hongye.com.cn:8082/hcitydata/dbs/jianshu.json"
             },
             {
                 "class": "juejin",
@@ -692,7 +692,7 @@
                 "class": "kuaishou",
                 "name": "快手",
                 "title": "热榜",
-                "src_url": "http://hc.hongye.com.cn:8083/hcitydata/dbs/kuaishou.html"
+                "src_url": "http://hc.hongye.com.cn:8082/hcitydata/dbs/kuaishou.html"
             },
             {
                 "class": "netease",
@@ -736,7 +736,7 @@
                 "class": "rustcc",
                 "name": "Rust中文社区",
                 "title": "最新贴子",
-                "src_url": "http://hc.hongye.com.cn:8083/hcitydata/dbs/rustcc-rss.xml"
+                "src_url": "http://hc.hongye.com.cn:8082/hcitydata/dbs/rustcc-rss.xml"
             },
             {
                 "class": "sina",
@@ -766,7 +766,7 @@
                 "class": "thepaper",
                 "name": "澎湃新闻",
                 "title": "热榜",
-                "src_url": "http://hc.hongye.com.cn:8083/hcitydata/dbs/the-paper.json"
+                "src_url": "http://hc.hongye.com.cn:8082/hcitydata/dbs/the-paper.json"
             },
             {
                 "class": "tieba",
