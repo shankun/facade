@@ -28,7 +28,7 @@ Json::Value src_36kr::ParseData(const HttpResponsePtr& pResp) const
 {
     Json::Value finalResp;
 
-    if ((pResp->contentType() != CT_APPLICATION_JSON) || 
+    if ((pResp->contentType() != CT_APPLICATION_JSON) ||
         !(pResp->jsonObject()))
     {
         finalResp["code"] = static_cast<int>(k500InternalServerError);
@@ -78,7 +78,7 @@ Json::Value src_baidu::ParseData(const HttpResponsePtr& pResp) const
 
     Json::Value root;
     const std::string htmlBody = pResp->body().data();
-    
+
     // 正则表达式匹配引起 segment fault
     // std::regex embedReg("/<!--s-data:(.*?)-->/s");
     // std::smatch results;
@@ -199,7 +199,7 @@ Json::Value src_bestblogs::ParseData(const HttpResponsePtr& pResp) const
         finalResp["code"] = static_cast<int>(result.status);
         finalResp["message"] = result.description();
     }
-    
+
     return finalResp;
 }
 
@@ -216,7 +216,7 @@ Json::Value src_bilibili::ParseData(const HttpResponsePtr& pResp) const
 {
     Json::Value finalResp;
 
-    if ((pResp->contentType() != CT_APPLICATION_JSON) || 
+    if ((pResp->contentType() != CT_APPLICATION_JSON) ||
         !(pResp->jsonObject()))
     {
         finalResp["code"] = static_cast<int>(k500InternalServerError);
@@ -264,7 +264,7 @@ Json::Value src_calendar::ParseData(const HttpResponsePtr& pResp) const
 {
     Json::Value finalResp;
     // 返回格式为text/json
-    if ((pResp->contentType() != CT_CUSTOM) || 
+    if ((pResp->contentType() != CT_CUSTOM) ||
         !(pResp->jsonObject()))
     {
         finalResp["code"] = static_cast<int>(k500InternalServerError);
@@ -323,7 +323,7 @@ Json::Value src_ckxx::ParseData(const HttpResponsePtr& pResp) const
 {
     Json::Value finalResp;
 
-    if ((pResp->contentType() != CT_APPLICATION_JSON) || 
+    if ((pResp->contentType() != CT_APPLICATION_JSON) ||
         !(pResp->jsonObject()))
     {
         finalResp["code"] = static_cast<int>(k500InternalServerError);
@@ -391,7 +391,7 @@ Json::Value src_douban::ParseData(const HttpResponsePtr& pResp) const
             return finalResp;
         }
 
-        const auto& items = 
+        const auto& items =
                 parser.find_all(article, "tr", {{"class", "item"}});
 
         for(const TagNode& item : items)
@@ -462,7 +462,7 @@ Json::Value src_douban::ParseData(const HttpResponsePtr& pResp) const
             const TagNode& description = parser.find(movie, "p", found);
             if (found)
                 eachMovie["desc"] = parser.getNodeText(description);
-                
+
             finalResp["data"].append(eachMovie);
         }
     }
@@ -472,7 +472,7 @@ Json::Value src_douban::ParseData(const HttpResponsePtr& pResp) const
         finalResp["message"] = e.what();
         return finalResp;
     }
-    
+
     return finalResp;
 }
 
@@ -565,7 +565,7 @@ Json::Value src_douban_group::ParseData(const HttpResponsePtr& pResp) const
                 if (found)
                     eachTopic["source"] = parser.getNodeText(src_a);
             }
-                
+
             finalResp["data"].append(eachTopic);
         }
     }
@@ -593,7 +593,7 @@ Json::Value src_douyin::ParseData(const HttpResponsePtr& pResp) const
 {
     Json::Value finalResp;
 
-    if ((pResp->contentType() != CT_APPLICATION_JSON) || 
+    if ((pResp->contentType() != CT_APPLICATION_JSON) ||
         !(pResp->jsonObject()))
     {
         finalResp["code"] = static_cast<int>(k500InternalServerError);
@@ -636,7 +636,7 @@ Json::Value src_douyin_music::ParseData(const HttpResponsePtr& pResp) const
 {
     Json::Value finalResp;
 
-    if ((pResp->contentType() != CT_APPLICATION_JSON) || 
+    if ((pResp->contentType() != CT_APPLICATION_JSON) ||
         !(pResp->jsonObject()))
     {
         finalResp["code"] = static_cast<int>(k500InternalServerError);
@@ -763,7 +763,7 @@ Json::Value src_github::ParseData(const HttpResponsePtr& pResp) const
             const TagNode& articleH2 = parser.find(article, "h2", found);
             if (!found)
                 continue;
-            
+
             const TagNode& a_tag = parser.find(articleH2, "a", found);
             if (!found)
                 continue;
@@ -784,7 +784,7 @@ Json::Value src_github::ParseData(const HttpResponsePtr& pResp) const
             eachProj["title"] = projname + ": " + strVal;
             strVal.clear();
             const Node& div_f6 = found ? article_p.getNextSibling() : articleH2.getNextSibling();
-            const TagNode& lang = parser.find(div_f6, "span", 
+            const TagNode& lang = parser.find(div_f6, "span",
                     {{"itemprop", "programmingLanguage"}}, found);
 
             if (found)
@@ -818,7 +818,7 @@ Json::Value src_github::ParseData(const HttpResponsePtr& pResp) const
         finalResp["message"] = e.what();
         return finalResp;
     }
-    
+
     return finalResp;
 }
 
@@ -864,7 +864,7 @@ Json::Value src_hupu::ParseData(const HttpResponsePtr& pResp) const
             }
         }
     }
-    
+
     Json::Value topicList = root["topic"]["threads"]["list"];
     if (false == topicList.isArray())
     {
@@ -905,7 +905,7 @@ Json::Value src_huxiu::ParseData(const HttpResponsePtr& pResp) const
 {
     Json::Value finalResp;
     // 返回格式为text/xml
-    if ((pResp->contentType() != CT_TEXT_XML) || pResp->body().empty())
+    if ((pResp->contentType() != CT_APPLICATION_XML) || pResp->body().empty())
     {
         finalResp["code"] = static_cast<int>(k500InternalServerError);
         finalResp["message"] = "虎嗅 返回内容格式错误！";
@@ -923,7 +923,7 @@ Json::Value src_huxiu::ParseData(const HttpResponsePtr& pResp) const
     {
         const std::string newLine = "\n";
         pugi::xpath_node_set items = doc.select_nodes("/rss/channel/item");
-        for (pugi::xpath_node_set::const_iterator itr = items.begin(); 
+        for (pugi::xpath_node_set::const_iterator itr = items.begin();
             itr != items.end(); ++itr)
         {
             Json::Value eachPost;
@@ -965,7 +965,7 @@ Json::Value src_ithome::ParseData(const HttpResponsePtr& pResp) const
 {
     Json::Value finalResp;
     // 返回格式为text/xml
-    if ((pResp->contentType() != CT_TEXT_XML) || pResp->body().empty())
+    if ((pResp->contentType() != CT_APPLICATION_XML) || pResp->body().empty())
     {
         finalResp["code"] = static_cast<int>(k500InternalServerError);
         finalResp["message"] = "ithome 返回内容格式错误！";
@@ -1005,7 +1005,7 @@ Json::Value src_ithome::ParseData(const HttpResponsePtr& pResp) const
         finalResp["code"] = static_cast<int>(result.status);
         finalResp["message"] = result.description();
     }
-    
+
     return finalResp;
 }
 
@@ -1022,7 +1022,7 @@ Json::Value src_jianshu::ParseData(const HttpResponsePtr& pResp) const
 {
     Json::Value finalResp;
 
-    if ((pResp->contentType() != CT_APPLICATION_JSON) || 
+    if ((pResp->contentType() != CT_APPLICATION_JSON) ||
         !(pResp->jsonObject()))
     {
         finalResp["code"] = static_cast<int>(k500InternalServerError);
@@ -1064,7 +1064,7 @@ Json::Value src_juejin::ParseData(const HttpResponsePtr& pResp) const
 {
     Json::Value finalResp;
 
-    if ((pResp->contentType() != CT_APPLICATION_JSON) || 
+    if ((pResp->contentType() != CT_APPLICATION_JSON) ||
         !(pResp->jsonObject()))
     {
         finalResp["code"] = static_cast<int>(k500InternalServerError);
@@ -1157,7 +1157,7 @@ Json::Value src_kuaishou::ParseData(const HttpResponsePtr& pResp) const
 
             const std::string img_src{candidate["poster"].asString()};
             std::smatch results;
-            
+
             if (std::regex_search(img_src, results, idPattern))
                 val_str = results[1];
 
@@ -1288,19 +1288,19 @@ Json::Value src_netease_music::ParseData(const HttpResponsePtr& pResp) const
             {
                 if (itr != each["artists"].begin())
                     singers += " & ";
-                
+
                 singers += (*itr)["name"].asString();
             }
         }
 
         val_str = each["name"].asString();
-        
+
         if (singers.empty() == false)
             val_str += " - " + singers;
 
         song["title"] = val_str;
         song["pic"] = each["album"]["picUrl"];
-            
+
         song["url"] = "https://music.163.com/song?id=" + id_str;
         song["mobileUrl"] = song["url"];
         finalResp["data"].append(song);
@@ -1322,7 +1322,7 @@ Json::Value src_newsqq::ParseData(const HttpResponsePtr& pResp) const
 {
     Json::Value finalResp;
 
-    if ((pResp->contentType() != CT_APPLICATION_JSON) || 
+    if ((pResp->contentType() != CT_APPLICATION_JSON) ||
         !(pResp->jsonObject()))
     {
         finalResp["code"] = static_cast<int>(k500InternalServerError);
@@ -1393,7 +1393,7 @@ Json::Value src_qq_music::ParseData(const HttpResponsePtr& pResp) const
         std::replace(resp_str.begin(), resp_str.end(), '\n', ' ');
         std::stringstream ss(resp_str);
         std::string parseError;
-      
+
         if (!Json::parseFromStream(readFromstr, ss, &root, &parseError))
         {
             finalResp["code"] = static_cast<int>(k500InternalServerError);
@@ -1415,7 +1415,7 @@ Json::Value src_qq_music::ParseData(const HttpResponsePtr& pResp) const
         Json::Value song;
         const std::string id_str{each["data"]["songmid"].asString()};
         song["id"] = id_str;
- 
+
         std::string singers;
         if (each["data"]["singer"].isArray())
         {
@@ -1423,13 +1423,13 @@ Json::Value src_qq_music::ParseData(const HttpResponsePtr& pResp) const
             {
                 if (itr != each["data"]["singer"].begin())
                     singers += " & ";
-                
+
                 singers += (*itr)["name"].asString();
             }
         }
 
         val_str = each["data"]["songname"].asString();
-        
+
         if (singers.empty() == false)
             val_str += " - " + singers;
 
@@ -1456,7 +1456,7 @@ Json::Value src_rustcc::ParseData(const HttpResponsePtr& pResp) const
 {
     Json::Value finalResp;
     // 返回格式为text/xml
-    if ((pResp->contentType() != CT_TEXT_XML) || pResp->body().empty())
+    if ((pResp->contentType() != CT_APPLICATION_XML) || pResp->body().empty())
     {
         finalResp["code"] = static_cast<int>(k500InternalServerError);
         finalResp["message"] = "rustcc 返回内容格式错误！";
@@ -1472,7 +1472,7 @@ Json::Value src_rustcc::ParseData(const HttpResponsePtr& pResp) const
     {
         const std::string newLine = "\n";
         pugi::xpath_node_set items = doc.select_nodes("/rss/channel/item");
-        for (pugi::xpath_node_set::const_iterator itr = items.begin(); 
+        for (pugi::xpath_node_set::const_iterator itr = items.begin();
             itr != items.end(); ++itr)
         {
             Json::Value eachPost;
@@ -1489,7 +1489,7 @@ Json::Value src_rustcc::ParseData(const HttpResponsePtr& pResp) const
                 text.replace(pos, newLine.length(), "");
                 pos = text.find(newLine);
             }
-            
+
             text.erase(0, text.find_first_not_of(' ')); // trim
             text.erase(text.find_last_not_of(' ') + 1);
             eachPost["desc"] = text;
@@ -1624,7 +1624,7 @@ Json::Value src_smth::ParseData(const HttpResponsePtr& pResp) const
     if (result)
     {
         pugi::xpath_node_set items = doc.select_nodes("/rss/channel/item");
-        for (pugi::xpath_node_set::const_iterator itr = items.begin(); 
+        for (pugi::xpath_node_set::const_iterator itr = items.begin();
             itr != items.end(); ++itr)
         {
             Json::Value eachPost;
@@ -1668,7 +1668,7 @@ Json::Value src_sspai::ParseData(const HttpResponsePtr& pResp) const
 {
     Json::Value finalResp;
 
-    if ((pResp->contentType() != CT_APPLICATION_JSON) || 
+    if ((pResp->contentType() != CT_APPLICATION_JSON) ||
         !(pResp->jsonObject()))
     {
         finalResp["code"] = static_cast<int>(k500InternalServerError);
@@ -1729,7 +1729,7 @@ Json::Value src_solidot::ParseData(const HttpResponsePtr& pResp) const
     {
         const std::string newLine = "\n";
         pugi::xpath_node_set items = doc.select_nodes("/rss/channel/item");
-        for (pugi::xpath_node_set::const_iterator itr = items.begin(); 
+        for (pugi::xpath_node_set::const_iterator itr = items.begin();
             itr != items.end(); ++itr)
         {
             Json::Value eachPost;
@@ -1746,7 +1746,7 @@ Json::Value src_solidot::ParseData(const HttpResponsePtr& pResp) const
                 text.replace(pos, newLine.length(), "");
                 pos = text.find(newLine);
             }
-            
+
             text.erase(0, text.find_first_not_of(' ')); // trim
             text.erase(text.find_last_not_of(' ') + 1);
             eachPost["desc"] = text;
@@ -1779,7 +1779,7 @@ Json::Value src_thepaper::ParseData(const HttpResponsePtr& pResp) const
 {
     Json::Value finalResp;
 
-    if ((pResp->contentType() != CT_APPLICATION_JSON) || 
+    if ((pResp->contentType() != CT_APPLICATION_JSON) ||
         !(pResp->jsonObject()))
     {
         finalResp["code"] = static_cast<int>(k500InternalServerError);
@@ -1824,7 +1824,7 @@ Json::Value src_tieba::ParseData(const HttpResponsePtr& pResp) const
 {
     Json::Value finalResp;
 
-    if ((pResp->contentType() != CT_APPLICATION_JSON) || 
+    if ((pResp->contentType() != CT_APPLICATION_JSON) ||
         !(pResp->jsonObject()))
     {
         finalResp["code"] = static_cast<int>(k500InternalServerError);
@@ -1865,7 +1865,7 @@ Json::Value src_toutiao::ParseData(const HttpResponsePtr& pResp) const
 {
     Json::Value finalResp;
 
-    if ((pResp->contentType() != CT_APPLICATION_JSON) || 
+    if ((pResp->contentType() != CT_APPLICATION_JSON) ||
         !(pResp->jsonObject()))
     {
         finalResp["code"] = static_cast<int>(k500InternalServerError);
@@ -1947,7 +1947,7 @@ Json::Value src_v2ex::ParseData(const HttpResponsePtr& pResp) const
         finalResp["message"] = e.what();
         return finalResp;
     }
-    
+
     return finalResp;
 }
 
@@ -1971,7 +1971,7 @@ Json::Value src_weibo::ParseData(const HttpResponsePtr& pResp) const
 {
     Json::Value finalResp;
 
-    if ((pResp->contentType() != CT_APPLICATION_JSON) || 
+    if ((pResp->contentType() != CT_APPLICATION_JSON) ||
         !(pResp->jsonObject()))
     {
         finalResp["code"] = static_cast<int>(k500InternalServerError);
@@ -2014,7 +2014,7 @@ Json::Value src_weread::ParseData(const HttpResponsePtr& pResp) const
 {
     Json::Value finalResp;
 
-    if ((pResp->contentType() != CT_APPLICATION_JSON) || 
+    if ((pResp->contentType() != CT_APPLICATION_JSON) ||
         !(pResp->jsonObject()))
     {
         finalResp["code"] = static_cast<int>(k500InternalServerError);
