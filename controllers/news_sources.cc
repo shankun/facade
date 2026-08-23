@@ -2054,32 +2054,35 @@ void src_zhihu::SetParameter(const std::string& subtype)
 HttpRequestPtr src_zhihu::CreateRequest(const drogon::HttpClientPtr& client) const
 {
     client->setUserAgent("Mozilla/5.0 (iPhone; CPU iPhone OS 15_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/15.0 Mobile/15E148 Safari/604.1");
-    // 读取可执行文件所在目录下的zhihu_cookie.txt
-    std::ifstream fCookie(dailyhot::GetCurProcPath() + "zhihu_cookie.txt");
-    if (fCookie.is_open())
+    // 读取可执行文件所在目录下的zhihu_token.txt，取第一行作为 token
+    std::string token;
+    std::ifstream fToken(dailyhot::GetCurProcPath() + "zhihu_token.txt");
+    if (fToken.is_open())
     {
-        std::string eachLine;
-        while (std::getline(fCookie, eachLine))
+        std::getline(fToken, token);
+        token = dailyhot::replaceAll(token, "\r", "");
+        auto first = token.find_first_not_of(" \t");
+        if (first != std::string::npos)
         {
-            eachLine = dailyhot::replaceAll(eachLine, "\r\n", "");
-            std::istringstream iss(eachLine);
-            std::string token;
-            while (std::getline(iss, token, ';'))
-            {
-                token.erase(0, token.find_first_not_of(' ')); // trim
-                token.erase(token.find_last_not_of(' ') + 1);
-                size_t sep = token.find('=');
-                if (sep != std::string::npos)
-                    client->addCookie(token.substr(0, sep), token.substr(sep + 1));
-            }
+            auto last = token.find_last_not_of(" \t");
+            token = token.substr(first, last - first + 1);
+        }
+        else
+        {
+            token.clear();
         }
     }
     else
     {
-        LOG_ERROR << "Read zhihu_cookie.txt failed!";
+        LOG_ERROR << "Read zhihu_token.txt failed!";
     }
 
-    return HttpRequest::newHttpRequest();
+    auto pReq = HttpRequest::newHttpRequest();
+    if (!token.empty())
+        pReq->addHeader("Authorization", "Bearer " + token);
+    pReq->addHeader("X-Request-Timestamp", std::to_string(trantor::Date::now().microSecondsSinceEpoch() / 1000000));
+    pReq->addHeader("Content-Type", "application/json");
+    return pReq;
 }
 
 Json::Value src_zhihu::ParseData(const HttpResponsePtr& pResp) const
@@ -2088,26 +2091,21 @@ Json::Value src_zhihu::ParseData(const HttpResponsePtr& pResp) const
 
     if (pResp->contentType() != CT_APPLICATION_JSON)
     {
-        finalResp["code"] = static_cast<int>(k500InternalServerError);
-        finalResp["message"] = "知乎 返回内容格式错误！";
+        finalResp["Code"] = static_cast<int>(k500InternalServerError);
+        finalResp["Message"] = "知乎 返回内容格式错误！";
         return finalResp;
     }
 
     std::string val_str;
     const Json::Value& root = *(pResp->jsonObject());
-    if (root["data"].isArray())
+    if (root["Data"]["Items"].isArray())
     {
-        const std::string questr{"/questions/"};
-        for (auto each_question : root["data"])
+        for (auto each_question : root["Data"]["Items"])
         {
             Json::Value item;
-            item["id"] = each_question["target"]["id"];
-            item["title"] = each_question["target"]["title"];
-            item["desc"] = each_question["target"]["excerpt"];
-            item["hot"] = each_question["target"]["follower_count"];
-            val_str = each_question["target"]["url"].asString();
-            val_str.replace(val_str.find("//api."), 6, "//www.");
-            val_str.replace(val_str.find(questr), questr.length(), "/question/");
+            item["title"] = each_question["Title"];
+            item["desc"] = each_question["Summary"];
+            val_str = each_question["Url"].asString();
             item["url"] = val_str;
             item["mobileUrl"] = val_str;
             finalResp["data"].append(item);
